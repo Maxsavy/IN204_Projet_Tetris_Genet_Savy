@@ -1,3 +1,5 @@
+Bonjour, ceci est la repos du projet tetris de YETIIIII et Maxime 2A Quebec.
+
 # CMake SFML Project Template
 
 This repository template should allow for a fast and hassle-free kick start of your next SFML project using CMake.
