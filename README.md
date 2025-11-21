@@ -1,4 +1,4 @@
-Bonjour, ceci est la repos du projet tetris de YETIIIII et Maxime 2A Quebec.
+Bonjour, ceci est la repos du projet tetris de YETIIII et Maxime 2A Quebec.
 
 # CMake SFML Project Template
 
