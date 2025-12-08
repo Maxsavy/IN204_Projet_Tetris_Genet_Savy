@@ -27,7 +27,7 @@ int main()
     }
     // SFML 3: Text requires a Font reference in its constructor
     sf::Text text{font, "YETI ET MAXIME 2A QUEBEC", 24};
-    text.setFillColor(sf::Color::Blue);
+    text.setFillColor(sf::Color::Green);
     text.setStyle(sf::Text::Bold | sf::Text::Underlined);
 
     while (window.isOpen())
