@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
-project(Projet Tetris SG)
+# Use a single token for the project name and declare the language explicitly
+project(ProjetTetrisSG LANGUAGES CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
