@@ -1,45 +1,62 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
-#include <filesystem>
+
+using namespace std;
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(sf::Vector2u{800u, 600u}), "Caca");
-    window.setFramerateLimit(144);
-
+    // --- LOADING FONT AND IMAGE ---
     sf::Font font;
 
-    // Try project-relative asset paths first (no leading slash)
-    const std::vector<std::filesystem::path> tryPaths = {
-        "assets/fonts/arial.ttf",
-        "assets/fonts/Arial.ttf"};
-    for (const auto &p : tryPaths)
+    if (!font.loadFromFile("assets/fonts/arcade.ttf"))
     {
-        std::cout << "Trying font: " << p << std::endl;
-        if (std::filesystem::exists(p))
-            std::cout << "-> path exists\n";
-        if (font.openFromFile(p))
-        {
-            std::cout << "Loaded font: " << p << std::endl;
-            break;
-        }
+        cout << "pas de font lol" << endl;
+        return -1;
     }
-    // SFML 3: Text requires a Font reference in its constructor
-    sf::Text text{font, "YETI ET MAXIME 2A QUEBEC", 24};
-    text.setFillColor(sf::Color::Blue);
-    text.setStyle(sf::Text::Bold | sf::Text::Underlined);
 
+    sf::Texture background;
+    if (!background.loadFromFile("assets/images/background_menu.jpg"))
+    {
+        cout << "pas d'image lol" << endl;
+        return -1;
+    }
+
+    // --- SETTING THE WINDOW ---
+    unsigned int windowWidth = 1280;
+    unsigned int windowHeight = 720;
+
+    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Tetris");
+    window.setFramerateLimit(144);
+
+    // --- SETUP SPRITE ---
+    sf::Sprite back_sprite(background);
+
+    sf::Vector2u imageSize = background.getSize();
+    float scaleX = static_cast<float>(windowWidth) / imageSize.x;
+    float scaleY = static_cast<float>(windowHeight) / imageSize.y;
+
+    back_sprite.setScale(scaleX, scaleY);
+
+    // --- SETTING TITLE ---
+    sf::Text title("TETRIS SA MERE", font, 90);
+    title.setFillColor(sf::Color::White);
+    title.setStyle(sf::Text::Bold);
+    title.setPosition(550.f, 100.f);
+
+    // --- GAME LOOP ---
     while (window.isOpen())
     {
-        while (auto event = window.pollEvent())
+        sf::Event event;
+        while (window.pollEvent(event))
         {
-            if (event->is<sf::Event::Closed>())
+            if (event.type == sf::Event::Closed)
                 window.close();
         }
 
         window.clear(sf::Color::Black);
-        window.draw(text);
+        window.draw(back_sprite);
+        window.draw(title);
         window.display();
     }
 
