@@ -1,4 +1,8 @@
-Bonjour, ceci est la repos du projet tetris de YETIIIII et Maxime 2A Quebec.
+# Repository du projet Tetris réalisé par Maxime SAVY et Tiago GENET
+
+## Description brève du projet
+
+ Ce projet a pour but d'implémenter une version de Tetris en C++ jouable sur tout système d'exploitation. Pour l'interface de jeu nous nous inspirons de la version classique du jeu d'arcade en ajoutant une option en multijoueur local.
 
 # CMake SFML Project Template
 
