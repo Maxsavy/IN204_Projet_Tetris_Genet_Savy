@@ -27,7 +27,6 @@ FetchContent_MakeAvailable(gamemenu)
 add_executable(tetris src/main.cpp)
 target_compile_features(tetris PRIVATE cxx_std_17)
 
-# FIX: Use lowercase target names (sfml-graphics) for SFML 2 built from source
 target_link_libraries(tetris PRIVATE 
     sfml-graphics
     sfml-audio
@@ -35,13 +34,12 @@ target_link_libraries(tetris PRIVATE
     gamemenu 
 )
 
-# --- Executable 2: The Test ---
+# --- Executable 2: The menu ---
 
-add_executable(test src/test.cpp)
-target_compile_features(test PRIVATE cxx_std_17)
+add_executable(menu src/ui/menu.cpp)
+target_compile_features(menu PRIVATE cxx_std_17)
 
-# FIX: Use lowercase target names here too
-target_link_libraries(test PRIVATE 
+target_link_libraries(menu PRIVATE 
     sfml-graphics
     sfml-audio
     sfml-network
