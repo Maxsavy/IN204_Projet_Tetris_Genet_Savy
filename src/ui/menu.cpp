@@ -1,4 +1,5 @@
 #include "menu.h"
+#include "../core/game.h"
 #include <iostream>
 using namespace std;
 
@@ -37,7 +38,6 @@ namespace game
                 menu_handle_event(_current_menu, event);
             }
             _window.clear();
-            // draw background if available
             if (background.getSize().x > 0 && background.getSize().y > 0)
             {
                 _window.draw(background_sprite);
@@ -96,6 +96,8 @@ namespace game
              [&](sf::RenderTarget &target)
              {
                  cout << "lancer jeu!" << endl;
+                 game::GameController gameController(_window);
+                 gameController.start();
              }},
             {"Leaderboard", [](sf::RenderTarget &target)
              {

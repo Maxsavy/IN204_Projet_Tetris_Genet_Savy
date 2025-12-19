@@ -24,7 +24,7 @@ FetchContent_Declare(gamemenu
 FetchContent_MakeAvailable(gamemenu)
 
 # --- Executable 1: The Game (Tetris) ---
-add_executable(tetris src/main.cpp)
+add_executable(tetris src/main.cpp src/core/game.cpp)
 target_compile_features(tetris PRIVATE cxx_std_17)
 
 target_link_libraries(tetris PRIVATE 
