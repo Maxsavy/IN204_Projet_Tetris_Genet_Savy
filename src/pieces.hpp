@@ -38,7 +38,7 @@ class SquarePiece: virtual public BasePiece
     public:
         SquarePiece() {}
 
-        ~BasePiece() {}
+        ~SquarePiece() {}
 
     virtual void const rotateRight();
 
