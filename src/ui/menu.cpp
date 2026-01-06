@@ -95,7 +95,6 @@ namespace game
             {"New Game",
              [&](sf::RenderTarget &target)
              {
-                 cout << "lancer jeu!" << endl;
                  game::GameController gameController(_window);
                  gameController.start();
              }},
@@ -111,7 +110,7 @@ namespace game
              { this->_is_exit_requested = true; }}};
 
         game_menu::MenuConfig config{
-            .title = " Tetris sa mere", .items = items, .style = style};
+            .title = " Tetris ouiii", .items = items, .style = style};
         _main_menu_context.reset(create_menu_context(_window, config));
         _current_menu = _main_menu_context.get();
     }

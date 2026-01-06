@@ -12,6 +12,9 @@ The template starts out very basic, but might receive additional features over t
 
 ## Quick start
 
+Pour lancer, taper la commande suivante :
+cmake -S . -B build && cmake --build build --target tetris && ./build/bin/tetris
+
 ### Command line
 
 1. Install [Git](https://git-scm.com/downloads) and [CMake](https://cmake.org/download/). Use your system's package manager if available.

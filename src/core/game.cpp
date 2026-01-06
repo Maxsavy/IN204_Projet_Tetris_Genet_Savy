@@ -1,8 +1,8 @@
 #include <iostream>
 #include "game.h"
+#include "../ui/menu.h"
 namespace game
 {
-
     // constructor
     GameController::GameController(sf::RenderWindow &w)
         : _window(w)
@@ -21,6 +21,8 @@ namespace game
     void GameController::gameLoop()
     {
         bool loopInvarient = true;
+        float scaleX = static_cast<float>(_window.getSize().x);
+        float scaleY = static_cast<float>(_window.getSize().y);
         while (loopInvarient)
         {
             setupScene();
@@ -29,25 +31,12 @@ namespace game
             {
                 if (event.type == sf::Event::KeyReleased)
                 {
-                    if (event.key.code == sf::Keyboard::Up)
+                    if (event.key.code == sf::Keyboard::Escape)
                     {
-                        direction.y = -1;
-                        direction.x = 0;
-                    }
-                    else if (event.key.code == sf::Keyboard::Down)
-                    {
-                        direction.y = 1;
-                        direction.x = 0;
-                    }
-                    else if (event.key.code == sf::Keyboard::Left)
-                    {
-                        direction.x = -1;
-                        direction.y = 0;
-                    }
-                    else if (event.key.code == sf::Keyboard::Right)
-                    {
-                        direction.x = 1;
-                        direction.y = 0;
+                        sf::RenderWindow window(sf::VideoMode(scaleX, scaleY), "Tetris");
+                        game::MainMenu menu(window);
+                        menu.start();
+                        exit(0);
                     }
                 }
                 if (event.type == sf::Event::Closed)
@@ -77,8 +66,12 @@ namespace game
             _window.draw(logo_sprite);
         }
 
-        // if (grid_sprite.getTexture())
-        //     _window.draw(grid_sprite);
+        if (grid_sprite.getTexture())
+        {
+            grid_sprite.setScale(1.6, 1.6);
+            grid_sprite.setPosition(515, 100);
+            _window.draw(grid_sprite);
+        }
     }
 
     bool checkCollision(const sf::RectangleShape &a, const sf::RectangleShape &b)
