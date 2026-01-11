@@ -27,6 +27,9 @@ public:
 
     void display_terminal() const;
 
+    void update_with_tetro(Tetro &tetro);
+
+
     ~Grid() {}
 
 };
