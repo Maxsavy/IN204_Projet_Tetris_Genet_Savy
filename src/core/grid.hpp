@@ -21,7 +21,7 @@ public:
 
     std::vector<int> cells;
     // initialize tetro
-    TetroT tempTetro; // temporary tetro to access getShape()
+    TetroL tempTetro;
 
     Grid() : rows(20), columns(10), cellSize(8)
     {
@@ -37,6 +37,7 @@ public:
 
     void display_terminal() const;
     void update_with_tetro(const Tetro &tetro);
+    void drawGrid(sf::RenderWindow &window);
 
     ~Grid()
     {

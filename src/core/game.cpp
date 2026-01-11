@@ -39,8 +39,7 @@ namespace game
                 {
                     if (event.key.code == sf::Keyboard::Escape)
                     {
-                        sf::RenderWindow window(sf::VideoMode(scaleX, scaleY), "Tetris");
-                        game::MainMenu menu(window);
+                        game::MainMenu menu(_window);
                         menu.start();
                         exit(0);
                     }
@@ -92,45 +91,7 @@ namespace game
             _window.draw(logo_sprite);
         }
 
-        // Draw the grid using the `real_grid` object (outline for empty, filled for occupied)
-        {
-            real_grid.update_with_tetro(real_grid.tempTetro);
-            int rows = real_grid.rows;
-            int cols = real_grid.columns;
-            int cellSize = real_grid.cellSize;
-            float pixelSize = static_cast<float>(cellSize * RESIZE_FACTOR);
-            float targetW = static_cast<float>(cols) * pixelSize;
-            float targetH = static_cast<float>(rows) * pixelSize;
-            float originX = (static_cast<float>(_window.getSize().x) - targetW) / 2.f;
-            float originY = (static_cast<float>(_window.getSize().y) - targetH) / 2.f;
-
-            sf::RectangleShape cellShape(sf::Vector2f(pixelSize, pixelSize));
-            cellShape.setOutlineThickness(1.f);
-            cellShape.setOutlineColor(sf::Color(100, 100, 100));
-
-            for (int i = 0; i < rows; ++i)
-            {
-                for (int j = 0; j < cols; ++j)
-                {
-                    float x = originX + j * pixelSize;
-                    float y = originY + i * pixelSize;
-                    cellShape.setPosition(x, y);
-                    int idx = j + i * cols;
-                    int val = 0;
-                    if (idx >= 0 && idx < static_cast<int>(real_grid.cells.size()))
-                        val = real_grid.cells[idx];
-
-                    if (val == 0)
-                        cellShape.setFillColor(sf::Color::Black);
-                    else if (val == 1)
-                        cellShape.setFillColor(sf::Color::White); // locked pieces
-                    else if (val == 2)
-                        cellShape.setFillColor(real_grid.tempTetro.color); // active piece with its color
-
-                    _window.draw(cellShape);
-                }
-            }
-        }
+        real_grid.drawGrid(_window);
     }
 
     bool checkCollision(const sf::RectangleShape &a, const sf::RectangleShape &b)

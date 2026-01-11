@@ -30,17 +30,12 @@ public:
     void setPosition(int x, int y);
 
 protected:
-    // initialize rotations from a piece definition
     void initializeShape(const int (&piece)[4][4][4]);
 
 private:
     std::array<std::array<std::array<int, 4>, 4>, 4> rotations;
-
-    // allow getShape to return reference to current rotation
-    friend const std::array<std::array<int, 4>, 4> &getShapeRef(const Tetro &t);
 };
 
-// Derived tetromino types: only declare constructors here; definitions in .cpp
 class TetroI : public Tetro
 {
 public:
@@ -82,5 +77,4 @@ class TetroZ : public Tetro
 public:
     TetroZ();
 };
-
 #endif // TETROS_HPP
