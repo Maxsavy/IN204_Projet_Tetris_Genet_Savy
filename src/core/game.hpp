@@ -1,5 +1,4 @@
 #include <SFML/Graphics.hpp>
-#include 
 #include <list>
 #include <random>
 #include <string>
@@ -35,7 +34,6 @@ namespace game
     {
     public:
         GameController(sf::RenderWindow &w);
-        G
 
         void start();
 

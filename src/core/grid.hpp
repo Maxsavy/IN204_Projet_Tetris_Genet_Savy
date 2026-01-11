@@ -13,7 +13,7 @@ public:
     int cellSize;
 
     std::vector<int> cells;
-    Tetro currentTetro;
+    // Tetro currentTetro;
 
     Grid(): rows(20), columns(10), cellSize(8) 
     {
