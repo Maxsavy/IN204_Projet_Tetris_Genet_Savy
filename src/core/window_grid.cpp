@@ -5,76 +5,73 @@
 
 #include "grid.hpp"
 
-constexpr  int ROWS = 20;
-constexpr int COLUMNS = 10;
-constexpr  int CELL_SIZE = 8;
-constexpr  int RESIZE_FACTOR = 4;
+// constexpr int ROWS = 20;
+// constexpr int COLUMNS = 10;
+// constexpr int CELL_SIZE = 8;
+// constexpr int RESIZE_FACTOR = 4;
 
-int main()
-{
-    sf::RenderWindow window(sf::VideoMode(COLUMNS * CELL_SIZE * RESIZE_FACTOR, ROWS * CELL_SIZE * RESIZE_FACTOR), "La fenetre SFML");
-    window.setFramerateLimit(144);
+// int main()
+// {
+//     sf::RenderWindow window(sf::VideoMode(COLUMNS * CELL_SIZE * RESIZE_FACTOR, ROWS * CELL_SIZE * RESIZE_FACTOR), "La fenetre SFML");
+//     window.setFramerateLimit(144);
 
-    sf::RectangleShape cell(sf::Vector2f((CELL_SIZE-1) * RESIZE_FACTOR, (CELL_SIZE-1) * RESIZE_FACTOR));
-    sf::Color empty(0,0,100);
-    sf::Color filled(255,0,0);
+//     sf::RectangleShape cell(sf::Vector2f((CELL_SIZE-1) * RESIZE_FACTOR, (CELL_SIZE-1) * RESIZE_FACTOR));
+//     sf::Color empty(0,0,100);
+//     sf::Color filled(255,0,0);
 
+//     Grid grid;
 
-    Grid grid;
+//     grid.display_terminal();
 
-    grid.display_terminal();
+//     window.clear(sf::Color::Black);
 
-    window.clear(sf::Color::Black);
+//     for (int i = 0; i < ROWS; i++) {
+//         for (int j = 0; j < COLUMNS; j++) {
+//             cell.setPosition(j * CELL_SIZE * RESIZE_FACTOR, i * CELL_SIZE * RESIZE_FACTOR);
+//             if (grid.cells[i * COLUMNS + j] == 0) {
+//                 cell.setFillColor(empty);
+//             } else {
+//                 cell.setFillColor(filled);
+//             }
+//             window.draw(cell);
+//         }
+//     }
 
-    for (int i = 0; i < ROWS; i++) {
-        for (int j = 0; j < COLUMNS; j++) {
-            cell.setPosition(j * CELL_SIZE * RESIZE_FACTOR, i * CELL_SIZE * RESIZE_FACTOR);
-            if (grid.cells[i * COLUMNS + j] == 0) {
-                cell.setFillColor(empty);
-            } else {
-                cell.setFillColor(filled);
-            }
-            window.draw(cell);
-        }
-    }
+//     while (window.isOpen())
+//     {
 
-    while (window.isOpen())
-    {
+//         sf::Event event;
+//         while (window.pollEvent(event))
+//         {
+//             if (event.type == sf::Event::Closed)
+//                 window.close();
 
-        
+//             if (event.type == sf::Event::KeyPressed)
+//             {
+//                 if (event.key.code == sf::Keyboard::Escape)
+//                     window.close();
 
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
+//             }
 
-            if (event.type == sf::Event::KeyPressed)
-            {
-                if (event.key.code == sf::Keyboard::Escape)
-                    window.close();
+//             if (event.type == sf::Event::MouseButtonPressed)
+//             {
+//                 if (event.mouseButton.button == sf::Mouse::Left)
+//                 {
+//                     int x = event.mouseButton.x / (CELL_SIZE * RESIZE_FACTOR);
+//                     int y = event.mouseButton.y / (CELL_SIZE * RESIZE_FACTOR);
+//                     grid.cells[y * COLUMNS + x] = 1; // Mark cell as filled
+//                     grid.display_terminal();
+//                     cell.setPosition(x * CELL_SIZE * RESIZE_FACTOR, y * CELL_SIZE * RESIZE_FACTOR);
+//                     cell.setFillColor(filled);
+//                     window.draw(cell);
+//                 }
+//             }
 
-            }
+//         }
 
-            if (event.type == sf::Event::MouseButtonPressed)
-            {
-                if (event.mouseButton.button == sf::Mouse::Left)
-                {
-                    int x = event.mouseButton.x / (CELL_SIZE * RESIZE_FACTOR);
-                    int y = event.mouseButton.y / (CELL_SIZE * RESIZE_FACTOR);
-                    grid.cells[y * COLUMNS + x] = 1; // Mark cell as filled
-                    grid.display_terminal();
-                    cell.setPosition(x * CELL_SIZE * RESIZE_FACTOR, y * CELL_SIZE * RESIZE_FACTOR);
-                    cell.setFillColor(filled);
-                    window.draw(cell);
-                }
-            }
+//         window.draw(cell);
+//         window.display();
+//     }
 
-        }
-
-        window.draw(cell);
-        window.display();
-    }
-
-    return 0;
-}
+//     return 0;
+// }

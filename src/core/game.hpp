@@ -1,4 +1,7 @@
+
+
 #include <SFML/Graphics.hpp>
+#include "grid.hpp"
 #include <list>
 #include <random>
 #include <string>
@@ -10,9 +13,9 @@ namespace game
     /*
     GameController is the central interface of the game.
     This class will monitor the working of game:
-    *	Movement of the pieces
-    *	Keyboard interactions
-    *	Lines disapearring...
+    *   Movement of the pieces
+    *   Keyboard interactions
+    *   Lines disapearring...
     */
 
     const std::string MenuStrings[5] = {"Game Over!", "Do you wish to continue?",
@@ -27,20 +30,26 @@ namespace game
         Exit,
     }; // menuText
 
+    constexpr int ROWS = 20;
+    constexpr int COLUMNS = 10;
+    constexpr int CELL_SIZE = 8;
+    constexpr int RESIZE_FACTOR = 4;
+
     /*==================================================*
-     *			The main game controller *
+     *          The main game controller *
      *===================================================*/
     class GameController
     {
     public:
         GameController(sf::RenderWindow &w);
+        Grid real_grid;
 
         void start();
 
     private:
         void gameLoop();
         void setupScene();
-        void gameOver(); // no definition yet
+        void gameOver();
         void loadResources();
         void loadTexture(sf::Texture &texture, const std::string &file, sf::Sprite &sprite);
         void setUpBackground(sf::Texture &texture, sf::Sprite &sprite);

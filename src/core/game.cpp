@@ -15,6 +15,12 @@ namespace game
     void GameController::start()
     {
         loadResources();
+        float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
+        float targetW = static_cast<float>(real_grid.columns) * pixelSize;
+        float originX = (static_cast<float>(_window.getSize().x) - targetW) / 2.f;
+        float originY = (static_cast<float>(_window.getSize().y) - static_cast<float>(real_grid.rows) * pixelSize) / 2.f;
+
+        real_grid.rectangle.setPosition(originX + (real_grid.columns / 2) * pixelSize, originY);
         gameLoop();
     }
 
@@ -37,6 +43,27 @@ namespace game
                         game::MainMenu menu(window);
                         menu.start();
                         exit(0);
+                    }
+
+                    if (event.key.code == sf::Keyboard::Down)
+                    {
+                        real_grid.rectangle.move(0, CELL_SIZE * RESIZE_FACTOR);
+                    }
+
+                    if (event.key.code == sf::Keyboard::Left)
+                    {
+                        real_grid.rectangle.move(-CELL_SIZE * RESIZE_FACTOR, 0);
+                    }
+
+                    if (event.key.code == sf::Keyboard::Right)
+                    {
+                        real_grid.rectangle.move(CELL_SIZE * RESIZE_FACTOR, 0);
+                    }
+
+                    if (event.key.code == sf::Keyboard::Up)
+                    {
+                        real_grid.rectangle.move(0, -CELL_SIZE * RESIZE_FACTOR);
+                        std::cout << "Position: (" << real_grid.rectangle.getPosition().x << ", " << real_grid.rectangle.getPosition().y << ")" << std::endl;
                     }
                 }
                 if (event.type == sf::Event::Closed)
@@ -66,11 +93,42 @@ namespace game
             _window.draw(logo_sprite);
         }
 
-        if (grid_sprite.getTexture())
+        // Draw the grid using the `real_grid` object (outline for empty, filled for occupied)
         {
-            grid_sprite.setScale(1.6, 1.6);
-            grid_sprite.setPosition(515, 100);
-            _window.draw(grid_sprite);
+            int rows = real_grid.rows;
+            int cols = real_grid.columns;
+            int cellSize = real_grid.cellSize;
+            float pixelSize = static_cast<float>(cellSize * RESIZE_FACTOR);
+            float targetW = static_cast<float>(cols) * pixelSize;
+            float targetH = static_cast<float>(rows) * pixelSize;
+            float originX = (static_cast<float>(_window.getSize().x) - targetW) / 2.f;
+            float originY = (static_cast<float>(_window.getSize().y) - targetH) / 2.f;
+
+            sf::RectangleShape cellShape(sf::Vector2f(pixelSize, pixelSize));
+            cellShape.setOutlineThickness(1.f);
+            cellShape.setOutlineColor(sf::Color(100, 100, 100));
+
+            for (int i = 0; i < rows; ++i)
+            {
+                for (int j = 0; j < cols; ++j)
+                {
+                    float x = originX + j * pixelSize;
+                    float y = originY + i * pixelSize;
+                    cellShape.setPosition(x, y);
+                    int idx = j + i * cols;
+                    int val = 0;
+                    if (idx >= 0 && idx < static_cast<int>(real_grid.cells.size()))
+                        val = real_grid.cells[idx];
+
+                    if (val == 0)
+                        cellShape.setFillColor(sf::Color::Black);
+                    else
+                        cellShape.setFillColor(sf::Color::Green);
+
+                    _window.draw(cellShape);
+                    _window.draw(real_grid.rectangle);
+                }
+            }
         }
     }
 
