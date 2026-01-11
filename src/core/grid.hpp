@@ -2,6 +2,7 @@
 #define GRID_HPP
 
 #include <vector>
+#include "tetros.hpp"
 #include <SFML/Graphics.hpp>
 
 constexpr int ROWS = 20;
@@ -19,6 +20,8 @@ public:
     sf::RectangleShape rectangle;
 
     std::vector<int> cells;
+    // initialize tetro
+    TetroT tempTetro; // temporary tetro to access getShape()
 
     Grid() : rows(20), columns(10), cellSize(8)
     {
@@ -30,13 +33,13 @@ public:
                 cells[i * columns + j] = 0;
             }
         }
-        // initialize rectangle used for rendering cells
-        rectangle.setSize(sf::Vector2f(static_cast<float>((cellSize)*RESIZE_FACTOR), static_cast<float>((cellSize)*RESIZE_FACTOR)));
-        rectangle.setFillColor(sf::Color::Green);
     }
 
     void display_terminal() const;
+    void update_with_tetro(const Tetro &tetro);
 
-    ~Grid() {}
+    ~Grid()
+    {
+    }
 };
 #endif // GRID_HPP

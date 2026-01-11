@@ -1,7 +1,7 @@
 #ifndef TETROS_HPP
 #define TETROS_HPP
 
-#include <vector>
+#include <array>
 #include <SFML/Graphics.hpp>
 
 enum class TetroType
@@ -19,20 +19,68 @@ class Tetro
 {
 public:
     Tetro();
-    Tetro(TetroType type) : type(type) {}
-    TetroType type;
+    virtual ~Tetro() = default;
+
     sf::Vector2i position;
+    int currentRotation;
     sf::Color color;
+
     void rotate();
     const std::array<std::array<int, 4>, 4> &getShape() const;
+    void setPosition(int x, int y);
+
+protected:
+    // initialize rotations from a piece definition
+    void initializeShape(const int (&piece)[4][4][4]);
 
 private:
     std::array<std::array<std::array<int, 4>, 4>, 4> rotations;
-    void initializeShape();
+
+    // allow getShape to return reference to current rotation
+    friend const std::array<std::array<int, 4>, 4> &getShapeRef(const Tetro &t);
 };
 
-class TetroI : Tetro
+// Derived tetromino types: only declare constructors here; definitions in .cpp
+class TetroI : public Tetro
 {
+public:
+    TetroI();
+};
+
+class TetroJ : public Tetro
+{
+public:
+    TetroJ();
+};
+
+class TetroL : public Tetro
+{
+public:
+    TetroL();
+};
+
+class TetroO : public Tetro
+{
+public:
+    TetroO();
+};
+
+class TetroS : public Tetro
+{
+public:
+    TetroS();
+};
+
+class TetroT : public Tetro
+{
+public:
+    TetroT();
+};
+
+class TetroZ : public Tetro
+{
+public:
+    TetroZ();
 };
 
 #endif // TETROS_HPP

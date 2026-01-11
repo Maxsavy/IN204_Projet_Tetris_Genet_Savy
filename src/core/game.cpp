@@ -20,7 +20,7 @@ namespace game
         float originX = (static_cast<float>(_window.getSize().x) - targetW) / 2.f;
         float originY = (static_cast<float>(_window.getSize().y) - static_cast<float>(real_grid.rows) * pixelSize) / 2.f;
 
-        real_grid.rectangle.setPosition(originX + (real_grid.columns / 2) * pixelSize, originY);
+        real_grid.tempTetro.setPosition(real_grid.columns / 2 - 2, 0);
         gameLoop();
     }
 
@@ -47,23 +47,22 @@ namespace game
 
                     if (event.key.code == sf::Keyboard::Down)
                     {
-                        real_grid.rectangle.move(0, CELL_SIZE * RESIZE_FACTOR);
+                        real_grid.tempTetro.position.y++;
                     }
 
                     if (event.key.code == sf::Keyboard::Left)
                     {
-                        real_grid.rectangle.move(-CELL_SIZE * RESIZE_FACTOR, 0);
+                        real_grid.tempTetro.position.x--;
                     }
 
                     if (event.key.code == sf::Keyboard::Right)
                     {
-                        real_grid.rectangle.move(CELL_SIZE * RESIZE_FACTOR, 0);
+                        real_grid.tempTetro.position.x++;
                     }
 
                     if (event.key.code == sf::Keyboard::Up)
                     {
-                        real_grid.rectangle.move(0, -CELL_SIZE * RESIZE_FACTOR);
-                        std::cout << "Position: (" << real_grid.rectangle.getPosition().x << ", " << real_grid.rectangle.getPosition().y << ")" << std::endl;
+                        real_grid.tempTetro.rotate();
                     }
                 }
                 if (event.type == sf::Event::Closed)
@@ -95,6 +94,7 @@ namespace game
 
         // Draw the grid using the `real_grid` object (outline for empty, filled for occupied)
         {
+            real_grid.update_with_tetro(real_grid.tempTetro);
             int rows = real_grid.rows;
             int cols = real_grid.columns;
             int cellSize = real_grid.cellSize;
@@ -122,11 +122,12 @@ namespace game
 
                     if (val == 0)
                         cellShape.setFillColor(sf::Color::Black);
-                    else
-                        cellShape.setFillColor(sf::Color::Green);
+                    else if (val == 1)
+                        cellShape.setFillColor(sf::Color::White); // locked pieces
+                    else if (val == 2)
+                        cellShape.setFillColor(real_grid.tempTetro.color); // active piece with its color
 
                     _window.draw(cellShape);
-                    _window.draw(real_grid.rectangle);
                 }
             }
         }
