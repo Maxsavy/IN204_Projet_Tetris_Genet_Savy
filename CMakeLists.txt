@@ -23,8 +23,10 @@ FetchContent_Declare(gamemenu
     GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(gamemenu)
 
+file(GLOB_RECURSE PROJECT_SOURCES src/*.cpp src/*.h src/*.hpp)
+
 # --- Executable 1: The Game (Tetris) ---
-add_executable(tetris src/main.cpp src/core/game.cpp)
+add_executable(tetris ${PROJECT_SOURCES})
 target_compile_features(tetris PRIVATE cxx_std_17)
 
 target_link_libraries(tetris PRIVATE 
@@ -32,16 +34,4 @@ target_link_libraries(tetris PRIVATE
     sfml-audio
     sfml-network
     gamemenu 
-)
-
-# --- Executable 2: The menu ---
-
-add_executable(menu src/ui/menu.cpp)
-target_compile_features(menu PRIVATE cxx_std_17)
-
-target_link_libraries(menu PRIVATE 
-    sfml-graphics
-    sfml-audio
-    sfml-network
-    gamemenu
 )

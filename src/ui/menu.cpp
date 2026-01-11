@@ -1,10 +1,9 @@
-#include "menu.h"
-#include "../core/game.h"
+#include "menu.hpp"
+#include "../core/game.hpp"
 #include <iostream>
 using namespace std;
 
-unsigned int windowWidth = 1280;
-unsigned int windowHeight = 720;
+
 
 namespace game
 {

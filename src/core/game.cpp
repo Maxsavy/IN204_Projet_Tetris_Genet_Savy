@@ -1,6 +1,6 @@
 #include <iostream>
-#include "game.h"
-#include "../ui/menu.h"
+#include "game.hpp"
+#include "../ui/menu.hpp"
 namespace game
 {
     // constructor
