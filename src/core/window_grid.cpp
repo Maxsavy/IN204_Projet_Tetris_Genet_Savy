@@ -3,61 +3,78 @@
 #include <vector>
 #include <filesystem>
 
+#include "grid.hpp"
+
 constexpr  int ROWS = 20;
 constexpr int COLUMNS = 10;
 constexpr  int CELL_SIZE = 8;
 constexpr  int RESIZE_FACTOR = 4;
 
-// int main()
-// {
-//     sf::RenderWindow window(sf::VideoMode(COLUMNS * CELL_SIZE * RESIZE_FACTOR, ROWS * CELL_SIZE * RESIZE_FACTOR), "La fenetre SFML");
-//     window.setFramerateLimit(144);
+int main()
+{
+    sf::RenderWindow window(sf::VideoMode(COLUMNS * CELL_SIZE * RESIZE_FACTOR, ROWS * CELL_SIZE * RESIZE_FACTOR), "La fenetre SFML");
+    window.setFramerateLimit(144);
 
-//     sf::RectangleShape rectangle(sf::Vector2f((CELL_SIZE-1) * RESIZE_FACTOR, (CELL_SIZE-1) * RESIZE_FACTOR));
-//     rectangle.setFillColor(sf::Color::Green);
+    sf::RectangleShape cell(sf::Vector2f((CELL_SIZE-1) * RESIZE_FACTOR, (CELL_SIZE-1) * RESIZE_FACTOR));
+    sf::Color empty(0,0,100);
+    sf::Color filled(255,0,0);
 
 
-//     while (window.isOpen())
-//     {
-//         sf::Event event;
-//         while (window.pollEvent(event))
-//         {
-//             if (event.type == sf::Event::Closed)
-//                 window.close();
+    Grid grid;
 
-//             if (event.type == sf::Event::KeyPressed)
-//             {
-//                 if (event.key.code == sf::Keyboard::Escape)
-//                     window.close();
+    grid.display_terminal();
 
-//                 if (event.key.code == sf::Keyboard::Down)
-//                 {
-//                     rectangle.move(0, CELL_SIZE * RESIZE_FACTOR);
-//                 }
+    window.clear(sf::Color::Black);
 
-//                 if (event.key.code == sf::Keyboard::Left)
-//                 {
-//                     rectangle.move(-CELL_SIZE * RESIZE_FACTOR, 0);
-//                 }
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLUMNS; j++) {
+            cell.setPosition(j * CELL_SIZE * RESIZE_FACTOR, i * CELL_SIZE * RESIZE_FACTOR);
+            if (grid.cells[i * COLUMNS + j] == 0) {
+                cell.setFillColor(empty);
+            } else {
+                cell.setFillColor(filled);
+            }
+            window.draw(cell);
+        }
+    }
 
-//                 if (event.key.code == sf::Keyboard::Right)
-//                 {
-//                     rectangle.move(CELL_SIZE * RESIZE_FACTOR, 0);
-//                 }
+    while (window.isOpen())
+    {
 
-//                 if (event.key.code == sf::Keyboard::Up)
-//                 {
-//                     rectangle.move(0, -CELL_SIZE * RESIZE_FACTOR);
-//                     std::cout << "Position: (" << rectangle.getPosition().x << ", " << rectangle.getPosition().y << ")" << std::endl;
-//                 }
-//             }
+        
 
-//         }
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
 
-//         window.clear(sf::Color::Black);
-//         window.draw(rectangle);
-//         window.display();
-//     }
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape)
+                    window.close();
 
-//     return 0;
-// }
+            }
+
+            if (event.type == sf::Event::MouseButtonPressed)
+            {
+                if (event.mouseButton.button == sf::Mouse::Left)
+                {
+                    int x = event.mouseButton.x / (CELL_SIZE * RESIZE_FACTOR);
+                    int y = event.mouseButton.y / (CELL_SIZE * RESIZE_FACTOR);
+                    grid.cells[y * COLUMNS + x] = 1; // Mark cell as filled
+                    grid.display_terminal();
+                    cell.setPosition(x * CELL_SIZE * RESIZE_FACTOR, y * CELL_SIZE * RESIZE_FACTOR);
+                    cell.setFillColor(filled);
+                    window.draw(cell);
+                }
+            }
+
+        }
+
+        window.draw(cell);
+        window.display();
+    }
+
+    return 0;
+}
