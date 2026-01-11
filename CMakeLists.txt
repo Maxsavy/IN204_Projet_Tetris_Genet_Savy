@@ -16,14 +16,32 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-# --- Executable 1: The game ---
-add_executable(window src/window_grid.cpp)
-target_compile_features(window PRIVATE cxx_std_17)
+# 2. Fetch GameMenu
+FetchContent_Declare(gamemenu
+    GIT_REPOSITORY https://github.com/ParadoxZero/GameMenu-cpp.git
+    GIT_TAG master
+    GIT_SHALLOW TRUE)
+FetchContent_MakeAvailable(gamemenu)
 
-target_link_libraries(window PRIVATE 
+# --- Executable 1: The Game (Tetris) ---
+add_executable(tetris src/main.cpp src/core/game.cpp)
+target_compile_features(tetris PRIVATE cxx_std_17)
+
+target_link_libraries(tetris PRIVATE 
     sfml-graphics
     sfml-audio
     sfml-network
+    gamemenu 
 )
 
+# --- Executable 2: The menu ---
 
+add_executable(menu src/ui/menu.cpp)
+target_compile_features(menu PRIVATE cxx_std_17)
+
+target_link_libraries(menu PRIVATE 
+    sfml-graphics
+    sfml-audio
+    sfml-network
+    gamemenu
+)
