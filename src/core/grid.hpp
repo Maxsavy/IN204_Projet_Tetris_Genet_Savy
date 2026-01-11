@@ -23,6 +23,8 @@ public:
         }
     }
 
+    void display_terminal() const {}
+
     ~Grid() {}
 
 
