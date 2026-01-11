@@ -4,6 +4,8 @@
 
 namespace game
 {
+    extern sf::Texture background;
+    extern sf::Sprite background_sprite;
 
     class MainMenu
     {
