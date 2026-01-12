@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "tetros.hpp"
+#include "pieces.hpp"
 #include <SFML/Graphics.hpp>
 
 constexpr int ROWS = 20;
@@ -19,7 +20,8 @@ public:
     int cellSize;
     std::vector<int> cells;
     // initialize tetro
-    TetroJ tempTetro;
+    Tetro tempTetro;
+    std::vector<TetroType> tetroList;
 
     Grid() : rows(20), columns(10), cellSize(8)
     {
@@ -34,8 +36,10 @@ public:
     }
 
     void display_terminal() const;
-    void update_with_tetro(const Tetro &tetro);
+    void update_with_tetro(const Tetro &tetro, int state);
     void drawGrid(sf::RenderWindow &window);
+    void generateTetro();
+    void lockTetroInGrid(const Tetro &tetro);
 
     ~Grid()
     {
