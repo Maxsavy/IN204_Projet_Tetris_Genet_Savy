@@ -40,7 +40,7 @@ bool Grid::check_collision(const Tetro &tetro, int futureX, int futureY) const
     return false; // No collision
 }
 
-void Grid::update_with_tetro(const Tetro &tetro)
+void Grid::update_with_tetro(const Tetro &tetro, int state)
 {
     for (int i = 0; i < rows * columns; i++)
     {
@@ -62,7 +62,7 @@ void Grid::update_with_tetro(const Tetro &tetro)
                 if (gridX >= 0 && gridX < columns && gridY >= 0 && gridY < rows)
                 {
                     int idx = gridY * columns + gridX;
-                    cells[idx] = 2;
+                    cells[idx] = state;
                 }
             }
         }
@@ -71,7 +71,7 @@ void Grid::update_with_tetro(const Tetro &tetro)
 
 void Grid::drawGrid(sf::RenderWindow &window)
 {
-    this->update_with_tetro(this->tempTetro);
+    this->update_with_tetro(this->tempTetro, 2);
     int rows = this->rows;
     int cols = this->columns;
     int cellSize = this->cellSize;
@@ -107,4 +107,51 @@ void Grid::drawGrid(sf::RenderWindow &window)
             window.draw(cellShape);
         }
     }
+}
+
+void Grid::generateTetro()
+{
+    if (tetroList.empty())
+    {
+        tetroList = std::vector<TetroType>(TETRO_BAG.begin(), TETRO_BAG.end());
+    }
+    int randomIndex = rand() % tetroList.size();
+    TetroType selectedType = tetroList[randomIndex];
+    tetroList.erase(tetroList.begin() + randomIndex);
+
+    switch (selectedType)
+    {
+    case TetroType::I:
+        tempTetro = TetroI();
+        break;
+    case TetroType::J:
+        tempTetro = TetroJ();
+        break;
+    case TetroType::L:
+        tempTetro = TetroL();
+        break;
+    case TetroType::O:
+        tempTetro = TetroO();
+        break;
+    case TetroType::S:
+        tempTetro = TetroS();
+        break;
+    case TetroType::T:
+        tempTetro = TetroT();
+        break;
+    case TetroType::Z:
+        tempTetro = TetroZ();
+        break;
+    default:
+        tempTetro = TetroI();
+        break;
+    }
+
+    tempTetro.setPosition(columns / 2 - 2, 0);
+}
+
+void Grid::lockTetroInGrid(const Tetro &tetro)
+{
+    update_with_tetro(tetro, 1);
+    generateTetro();
 }

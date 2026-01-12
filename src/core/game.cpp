@@ -20,7 +20,7 @@ namespace game
         float originX = (static_cast<float>(_window.getSize().x) - targetW) / 2.f;
         float originY = (static_cast<float>(_window.getSize().y) - static_cast<float>(real_grid.rows) * pixelSize) / 2.f;
 
-        real_grid.tempTetro.setPosition(real_grid.columns / 2 - 2, 0);
+        real_grid.generateTetro();
         gameLoop();
     }
 
@@ -63,6 +63,17 @@ namespace game
                     if (event.key.code == sf::Keyboard::Z)
                     {
                         real_grid.tempTetro.rotate();
+                    }
+                    if (event.key.code == sf::Keyboard::L)
+                    {
+                        real_grid.lockTetroInGrid(real_grid.tempTetro);
+                    }
+                }
+                if (event.type == sf::Event::KeyPressed)
+                {
+                    if (event.key.code == sf::Keyboard::Down)
+                    {
+                        real_grid.tempTetro.position.y++;
                     }
                 }
                 if (event.type == sf::Event::Closed)
