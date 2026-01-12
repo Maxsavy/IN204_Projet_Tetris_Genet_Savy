@@ -15,6 +15,12 @@ namespace game
     void GameController::start()
     {
         loadResources();
+        float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
+        float targetW = static_cast<float>(real_grid.columns) * pixelSize;
+        float originX = (static_cast<float>(_window.getSize().x) - targetW) / 2.f;
+        float originY = (static_cast<float>(_window.getSize().y) - static_cast<float>(real_grid.rows) * pixelSize) / 2.f;
+
+        real_grid.tempTetro.setPosition(real_grid.columns / 2 - 2, 0);
         gameLoop();
     }
 
@@ -33,10 +39,29 @@ namespace game
                 {
                     if (event.key.code == sf::Keyboard::Escape)
                     {
-                        sf::RenderWindow window(sf::VideoMode(scaleX, scaleY), "Tetris");
-                        game::MainMenu menu(window);
+                        game::MainMenu menu(_window);
                         menu.start();
                         exit(0);
+                    }
+
+                    if (event.key.code == sf::Keyboard::Down)
+                    {
+                        real_grid.tempTetro.position.y++;
+                    }
+
+                    if (event.key.code == sf::Keyboard::Left)
+                    {
+                        real_grid.tempTetro.position.x--;
+                    }
+
+                    if (event.key.code == sf::Keyboard::Right)
+                    {
+                        real_grid.tempTetro.position.x++;
+                    }
+
+                    if (event.key.code == sf::Keyboard::Up)
+                    {
+                        real_grid.tempTetro.rotate();
                     }
                 }
                 if (event.type == sf::Event::Closed)
@@ -66,12 +91,7 @@ namespace game
             _window.draw(logo_sprite);
         }
 
-        if (grid_sprite.getTexture())
-        {
-            grid_sprite.setScale(1.6, 1.6);
-            grid_sprite.setPosition(515, 100);
-            _window.draw(grid_sprite);
-        }
+        real_grid.drawGrid(_window);
     }
 
     bool checkCollision(const sf::RectangleShape &a, const sf::RectangleShape &b)

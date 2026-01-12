@@ -1,32 +1,84 @@
 #include "grid.hpp"
+#include "tetros.hpp"
 #include <iostream>
 
-void Grid::display_terminal() const {
-        for (int i = 0; i < rows; i++){
-            for (int j = 0; j < columns; j++){
-                std::cout << cells[i * columns + j] << " ";
+void Grid::display_terminal() const
+{
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < columns; j++)
+        {
+            std::cout << cells[i * columns + j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+void Grid::update_with_tetro(const Tetro &tetro)
+{
+    for (int i = 0; i < rows * columns; i++)
+    {
+        if (cells[i] == 2)
+            cells[i] = 0;
+    }
+
+    const auto &shape = tetro.getShape();
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (shape[i][j] == 1)
+            {
+                int gridX = tetro.position.x + j;
+                int gridY = tetro.position.y + i;
+
+                if (gridX >= 0 && gridX < columns && gridY >= 0 && gridY < rows)
+                {
+                    int idx = gridY * columns + gridX;
+                    cells[idx] = 2;
+                }
             }
-            std::cout << std::endl;
         }
     }
+}
 
-void Grid::update_with_tetro(Tetro &tetro) {
-    for (size_t i = 0; i < tetro.shape.size(); i++) {
-            if (tetro.shape[i] != 0) {
-                int grid_x = tetro.x + i%2;
-                int grid_y = tetro.y + i/2;
-                if (grid_x >= 0 && grid_x < columns && grid_y >= 0 && grid_y < rows) {
-                    cells[grid_y * columns + grid_x] = tetro.shape[i];
-                }
-                if (grid_y >= rows) {
-                    tetro.reset();
-                }
-            }
-    }
+void Grid::drawGrid(sf::RenderWindow &window)
+{
+    this->update_with_tetro(this->tempTetro);
+    int rows = this->rows;
+    int cols = this->columns;
+    int cellSize = this->cellSize;
+    float pixelSize = static_cast<float>(cellSize * RESIZE_FACTOR);
+    float targetW = static_cast<float>(cols) * pixelSize;
+    float targetH = static_cast<float>(rows) * pixelSize;
+    float originX = (static_cast<float>(window.getSize().x) - targetW) / 2.f;
+    float originY = (static_cast<float>(window.getSize().y) - targetH) / 2.f;
 
-    for (int i = 0; i < columns; i++){
-        cells[i+(tetro.y -1) * columns] = 0;
+    sf::RectangleShape cellShape(sf::Vector2f(pixelSize, pixelSize));
+    cellShape.setOutlineThickness(1.f);
+    cellShape.setOutlineColor(sf::Color(100, 100, 100));
+
+    for (int i = 0; i < rows; ++i)
+    {
+        for (int j = 0; j < cols; ++j)
+        {
+            float x = originX + j * pixelSize;
+            float y = originY + i * pixelSize;
+            cellShape.setPosition(x, y);
+            int idx = j + i * cols;
+            int val = 0;
+            if (idx >= 0 && idx < static_cast<int>(this->cells.size()))
+                val = this->cells[idx];
+
+            if (val == 0)
+                cellShape.setFillColor(sf::Color::Black);
+            else if (val == 1)
+                cellShape.setFillColor(sf::Color::White); // locked pieces
+            else if (val == 2)
+                cellShape.setFillColor(this->tempTetro.color); // active piece with its color
+
+            window.draw(cellShape);
+        }
     }
-    
-    
-}   
+}

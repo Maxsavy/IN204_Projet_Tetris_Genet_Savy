@@ -1,39 +1,80 @@
 #ifndef TETROS_HPP
 #define TETROS_HPP
 
-#include <vector>
+#include <array>
 #include <SFML/Graphics.hpp>
 
 enum class TetroType
 {
-    I, J, L, O, S, T, Z
+    I,
+    J,
+    L,
+    O,
+    S,
+    T,
+    Z
 };
 
 class Tetro
 {
 public:
-    int x;
-    int y;
-    std::vector<int> shape;
+    Tetro();
+    virtual ~Tetro() = default;
 
-    Tetro(): x(4), y(0), shape({1,1,
-                                1,1})
-    {}
+    sf::Vector2i position;
+    int currentRotation;
+    sf::Color color;
 
-    ~Tetro() {}
+    void rotate();
+    const std::array<std::array<int, 4>, 4> &getShape() const;
+    void setPosition(int x, int y);
 
-    bool move_down()
-    {
-        y += 1;
-        return true;
-    }
+protected:
+    void initializeShape(const int (&piece)[4][4][4]);
 
-    void reset()
-    {
-        x = 4;
-        y = 0;
-    }
-
+private:
+    std::array<std::array<std::array<int, 4>, 4>, 4> rotations;
 };
 
+class TetroI : public Tetro
+{
+public:
+    TetroI();
+};
+
+class TetroJ : public Tetro
+{
+public:
+    TetroJ();
+};
+
+class TetroL : public Tetro
+{
+public:
+    TetroL();
+};
+
+class TetroO : public Tetro
+{
+public:
+    TetroO();
+};
+
+class TetroS : public Tetro
+{
+public:
+    TetroS();
+};
+
+class TetroT : public Tetro
+{
+public:
+    TetroT();
+};
+
+class TetroZ : public Tetro
+{
+public:
+    TetroZ();
+};
 #endif // TETROS_HPP
