@@ -14,6 +14,32 @@ void Grid::display_terminal() const
     }
 }
 
+bool Grid::check_collision(const Tetro &tetro, int futureX, int futureY) const
+{
+    const auto &shape = tetro.getShape();
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (shape[i][j] == 1)
+            {
+                int cibleX = futureX + j;
+                int cibleY = futureY + i;
+
+                // Check boundaries
+                if (cibleX < 0 || cibleX >= columns || cibleY >= rows)
+                {
+                    return true; // Collision with walls or floor
+                }
+
+                
+            }   
+        }
+    }
+    return false; // No collision
+}
+
 void Grid::update_with_tetro(const Tetro &tetro)
 {
     for (int i = 0; i < rows * columns; i++)

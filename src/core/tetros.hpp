@@ -26,6 +26,9 @@ public:
     sf::Color color;
 
     void rotate();
+    void moveDown();
+    void moveLeft();
+    void moveRight();
     const std::array<std::array<int, 4>, 4> &getShape() const;
     void setPosition(int x, int y);
 

@@ -32,6 +32,7 @@ namespace game
         while (loopInvarient)
         {
             setupScene();
+            bool colision;
             sf::Event event;
             while (_window.pollEvent(event))
             {
@@ -44,22 +45,22 @@ namespace game
                         exit(0);
                     }
 
-                    if (event.key.code == sf::Keyboard::Down)
+
+                    if (event.key.code == sf::Keyboard::Q)
                     {
-                        real_grid.tempTetro.position.y++;
+                        colision = real_grid.check_collision(real_grid.tempTetro, real_grid.tempTetro.position.x - 1, real_grid.tempTetro.position.y);
+                        if (!colision)
+                            real_grid.tempTetro.moveLeft();
                     }
 
-                    if (event.key.code == sf::Keyboard::Left)
+                    if (event.key.code == sf::Keyboard::D)
                     {
-                        real_grid.tempTetro.position.x--;
+                        colision = real_grid.check_collision(real_grid.tempTetro, real_grid.tempTetro.position.x + 1, real_grid.tempTetro.position.y);
+                        if (!colision)
+                            real_grid.tempTetro.moveRight();
                     }
 
-                    if (event.key.code == sf::Keyboard::Right)
-                    {
-                        real_grid.tempTetro.position.x++;
-                    }
-
-                    if (event.key.code == sf::Keyboard::Up)
+                    if (event.key.code == sf::Keyboard::Z)
                     {
                         real_grid.tempTetro.rotate();
                     }
@@ -69,6 +70,15 @@ namespace game
                     exit(0);
                 }
             } // event loop
+
+            if (gameClock.getElapsedTime().asSeconds() >= 0.5f )
+            {
+                gameClock.restart();
+                colision = real_grid.check_collision(real_grid.tempTetro, real_grid.tempTetro.position.x, real_grid.tempTetro.position.y + 1);
+                if (!colision)
+                    real_grid.tempTetro.moveDown();
+        
+            }
             _window.display();
             _window.setFramerateLimit(60);
         }

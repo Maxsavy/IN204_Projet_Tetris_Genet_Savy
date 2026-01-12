@@ -34,6 +34,7 @@ public:
     }
 
     void display_terminal() const;
+    bool check_collision(const Tetro &tetro, int futureX, int FutureY) const;
     void update_with_tetro(const Tetro &tetro);
     void drawGrid(sf::RenderWindow &window);
 

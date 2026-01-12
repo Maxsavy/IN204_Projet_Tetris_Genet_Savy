@@ -72,6 +72,22 @@ void Tetro::rotate()
     currentRotation = (currentRotation + 1) % 4;
 }
 
+void Tetro::moveDown()
+{
+    position.y += 1;
+}
+
+void Tetro::moveLeft()
+{
+    position.x -= 1;
+}
+
+void Tetro::moveRight()
+{
+    position.x += 1;
+}
+
+
 const std::array<std::array<int, 4>, 4> &Tetro::getShape() const
 {
     return rotations[currentRotation];

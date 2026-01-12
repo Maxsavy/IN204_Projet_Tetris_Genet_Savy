@@ -41,6 +41,7 @@ namespace game
     public:
         GameController(sf::RenderWindow &w);
         Grid real_grid;
+        sf::Clock gameClock;
 
         void start();
 
