@@ -16,14 +16,12 @@ void Grid::display_terminal() const
 
 void Grid::update_with_tetro(const Tetro &tetro)
 {
-    // Reset grid to only show locked pieces (assuming 1 = locked, 2 = active piece)
     for (int i = 0; i < rows * columns; i++)
     {
-        if (cells[i] == 2) // clear previous active piece position
+        if (cells[i] == 2)
             cells[i] = 0;
     }
 
-    // Get the current shape
     const auto &shape = tetro.getShape();
 
     for (int i = 0; i < 4; i++)
