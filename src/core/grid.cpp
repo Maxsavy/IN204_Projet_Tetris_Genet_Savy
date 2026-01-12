@@ -14,7 +14,7 @@ void Grid::display_terminal() const
     }
 }
 
-bool Grid::check_collision(const Tetro &tetro, int futureX, int futureY) const
+int Grid::check_collision(const Tetro &tetro, int futureX, int futureY) const
 {
     const auto &shape = tetro.getShape();
 
@@ -28,16 +28,26 @@ bool Grid::check_collision(const Tetro &tetro, int futureX, int futureY) const
                 int cibleY = futureY + i;
 
                 // Check boundaries
-                if (cibleX < 0 || cibleX >= columns || cibleY >= rows)
+                if (cibleX < 0 || cibleX >= columns)
                 {
-                    return true; // Collision with walls or floor
+                    return 1; // Collision with walls or floor
                 }
 
+                if (cibleY >= rows)
+                {
+                    return 2; // Collision with floor
+                }
+
+                int indx = cibleY * columns + cibleX;
+                if (cells[indx] == 1)
+                {
+                    return 1; // Collision with locked pieces
+                }
                 
             }   
         }
     }
-    return false; // No collision
+    return 0; // No collision
 }
 
 void Grid::update_with_tetro(const Tetro &tetro, int state)

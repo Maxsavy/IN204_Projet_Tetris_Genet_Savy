@@ -32,11 +32,11 @@ namespace game
         while (loopInvarient)
         {
             setupScene();
-            bool colision;
+            int colision;
             sf::Event event;
             while (_window.pollEvent(event))
             {
-                if (event.type == sf::Event::KeyReleased)
+                if (event.type == sf::Event::KeyPressed)
                 {
                     if (event.key.code == sf::Keyboard::Escape)
                     {
@@ -45,35 +45,30 @@ namespace game
                         exit(0);
                     }
 
+                    if (event.key.code == sf::Keyboard::S)
+                    {
+                        colision = real_grid.check_collision(real_grid.tempTetro, real_grid.tempTetro.position.x, real_grid.tempTetro.position.y + 1);
+                        if (colision == 0)
+                            real_grid.tempTetro.position.y++;
+                    }
 
                     if (event.key.code == sf::Keyboard::Q)
                     {
                         colision = real_grid.check_collision(real_grid.tempTetro, real_grid.tempTetro.position.x - 1, real_grid.tempTetro.position.y);
-                        if (!colision)
+                        if (colision == 0)
                             real_grid.tempTetro.moveLeft();
                     }
 
                     if (event.key.code == sf::Keyboard::D)
                     {
                         colision = real_grid.check_collision(real_grid.tempTetro, real_grid.tempTetro.position.x + 1, real_grid.tempTetro.position.y);
-                        if (!colision)
+                        if (colision == 0)
                             real_grid.tempTetro.moveRight();
                     }
 
                     if (event.key.code == sf::Keyboard::Z)
                     {
                         real_grid.tempTetro.rotate();
-                    }
-                    if (event.key.code == sf::Keyboard::L)
-                    {
-                        real_grid.lockTetroInGrid(real_grid.tempTetro);
-                    }
-                }
-                if (event.type == sf::Event::KeyPressed)
-                {
-                    if (event.key.code == sf::Keyboard::Down)
-                    {
-                        real_grid.tempTetro.position.y++;
                     }
                 }
                 if (event.type == sf::Event::Closed)
@@ -86,9 +81,13 @@ namespace game
             {
                 gameClock.restart();
                 colision = real_grid.check_collision(real_grid.tempTetro, real_grid.tempTetro.position.x, real_grid.tempTetro.position.y + 1);
-                if (!colision)
+                if (colision == 0)
                     real_grid.tempTetro.moveDown();
-        
+                else if (colision == 2)
+                {
+                    real_grid.lockTetroInGrid(real_grid.tempTetro);
+                    real_grid.generateTetro();  
+                }
             }
             _window.display();
             _window.setFramerateLimit(60);
