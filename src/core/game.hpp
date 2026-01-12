@@ -1,5 +1,3 @@
-
-
 #include <SFML/Graphics.hpp>
 #include "grid.hpp"
 #include <list>

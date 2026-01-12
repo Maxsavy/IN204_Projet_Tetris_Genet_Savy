@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "tetros.hpp"
-#include "rotations.hpp"
+#include "pieces.hpp"
 #include <SFML/Graphics.hpp>
 
 void Tetro::initializeShape(const int (&piece)[4][4][4])

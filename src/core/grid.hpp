@@ -19,7 +19,7 @@ public:
     int cellSize;
     std::vector<int> cells;
     // initialize tetro
-    TetroS tempTetro;
+    TetroJ tempTetro;
 
     Grid() : rows(20), columns(10), cellSize(8)
     {
