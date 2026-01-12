@@ -68,6 +68,13 @@ namespace game
                         real_grid.lockTetroInGrid(real_grid.tempTetro);
                     }
                 }
+                if (event.type == sf::Event::KeyPressed)
+                {
+                    if (event.key.code == sf::Keyboard::Down)
+                    {
+                        real_grid.tempTetro.position.y++;
+                    }
+                }
                 if (event.type == sf::Event::Closed)
                 {
                     exit(0);
