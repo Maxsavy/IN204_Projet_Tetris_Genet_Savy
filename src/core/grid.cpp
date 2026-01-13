@@ -115,11 +115,36 @@ void Grid::drawGrid(sf::RenderWindow &window)
 
             if (val == 0)
                 cellShape.setFillColor(sf::Color::Black);
-            else if (val != 0 && val != 1)
-                cellShape.setFillColor(sf::Color::White); // locked pieces
             else if (val == 1)
                 cellShape.setFillColor(this->tempTetro.color); // active piece with its color
-
+            else if (val != 0 && val != 1)
+            {
+                switch (val)
+                {
+                case 2:
+                    cellShape.setFillColor(sf::Color::Cyan); // I piece
+                    break;
+                case 3:
+                    cellShape.setFillColor(sf::Color::Blue); // J piece
+                    break;  
+                case 4:
+                    cellShape.setFillColor(sf::Color(255, 165, 0)); // L piece
+                    break;
+                case 5:
+                    cellShape.setFillColor(sf::Color::Yellow); // O piece
+                    break;
+                case 6:
+                    cellShape.setFillColor(sf::Color::Green); // S piece
+                    break;
+                case 7:
+                    cellShape.setFillColor(sf::Color::Magenta); // T piece
+                    break;
+                case 8:
+                    cellShape.setFillColor(sf::Color::Red); // Z piece
+                    break;
+                }
+            }
+                
             window.draw(cellShape);
         }
     }
