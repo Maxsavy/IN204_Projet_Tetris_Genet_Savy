@@ -39,13 +39,13 @@ int Grid::check_collision(const Tetro &tetro, int futureX, int futureY) const
                 }
                 
                 int indx_bottom = (tetro.position.y +1 + i) * columns + cibleX;
-                if (cells[indx_bottom] == 1)
+                if (cells[indx_bottom] != 0 && cells[indx_bottom] != 1)
                 {
                     return 2; // Collision when moving down onto locked pieces
                 }
 
                 int indx = cibleY * columns + cibleX;
-                if (cells[indx] == 1)
+                if (cells[indx] != 0 && cells[indx] != 1)
                 {
                     return 1; // Collision with locked pieces
                 }
@@ -115,9 +115,9 @@ void Grid::drawGrid(sf::RenderWindow &window)
 
             if (val == 0)
                 cellShape.setFillColor(sf::Color::Black);
-            else if (val == 1)
+            else if (val != 0 && val != 1)
                 cellShape.setFillColor(sf::Color::White); // locked pieces
-            else if (val == 2)
+            else if (val == 1)
                 cellShape.setFillColor(this->tempTetro.color); // active piece with its color
 
             window.draw(cellShape);
@@ -168,6 +168,6 @@ void Grid::generateTetro()
 
 void Grid::lockTetroInGrid(const Tetro &tetro)
 {
-    update_with_tetro(tetro, 2);
+    update_with_tetro(tetro, tetro.colorRef);
     generateTetro();
 }
