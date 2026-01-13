@@ -60,7 +60,7 @@ void Grid::update_with_tetro(const Tetro &tetro, int state)
 {
     for (int i = 0; i < rows * columns; i++)
     {
-        if (cells[i] == 2)
+        if (cells[i] == 1)
             cells[i] = 0;
     }
 
@@ -87,7 +87,7 @@ void Grid::update_with_tetro(const Tetro &tetro, int state)
 
 void Grid::drawGrid(sf::RenderWindow &window)
 {
-    this->update_with_tetro(this->tempTetro, 2);
+    this->update_with_tetro(this->tempTetro, 1);
     int rows = this->rows;
     int cols = this->columns;
     int cellSize = this->cellSize;
@@ -168,6 +168,6 @@ void Grid::generateTetro()
 
 void Grid::lockTetroInGrid(const Tetro &tetro)
 {
-    update_with_tetro(tetro, 1);
+    update_with_tetro(tetro, 2);
     generateTetro();
 }

@@ -24,6 +24,7 @@ public:
     sf::Vector2i position;
     int currentRotation;
     sf::Color color;
+    int colorRef;
 
     void rotate();
     void moveDown();
