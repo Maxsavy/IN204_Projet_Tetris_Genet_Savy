@@ -39,7 +39,7 @@ int Grid::check_collision(const Tetro &tetro, int futureX, int futureY) const
                 }
                 
                 int indx_bottom = (tetro.position.y +1 + i) * columns + cibleX;
-                if (cells[indx_bottom] != 0 && cells[indx_bottom] != 1 || cibleY >= rows)
+                if (cells[indx_bottom] != 0 && cells[indx_bottom] != 1)
                 {
                     return 2; // Collision when moving down onto locked pieces
                 }
