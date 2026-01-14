@@ -16,11 +16,12 @@ namespace game
     {
         loadResources();
         float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
-        float targetW = static_cast<float>(real_grid.columns) * pixelSize;
+        float targetW = static_cast<float>(COLUMNS) * pixelSize;
         float originX = (static_cast<float>(_window.getSize().x) - targetW) / 2.f;
-        float originY = (static_cast<float>(_window.getSize().y) - static_cast<float>(real_grid.rows) * pixelSize) / 2.f;
+        float originY = (static_cast<float>(_window.getSize().y) - static_cast<float>(ROWS) * pixelSize) / 2.f;
 
-        real_grid.generateTetro();
+        player.generateTetro(player.currentTetro);
+        player.generateTetro(player.nextTetro);
         gameLoop();
     }
 
@@ -47,28 +48,28 @@ namespace game
 
                     if (event.key.code == sf::Keyboard::S)
                     {
-                        colision = real_grid.check_collision(real_grid.tempTetro, real_grid.tempTetro.position.x, real_grid.tempTetro.position.y + 1);
+                        colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.position.x, player.currentTetro.position.y + 1);
                         if (colision == 0)
-                            real_grid.tempTetro.position.y++;
+                            player.currentTetro.position.y++;
                     }
 
                     if (event.key.code == sf::Keyboard::Q)
                     {
-                        colision = real_grid.check_collision(real_grid.tempTetro, real_grid.tempTetro.position.x - 1, real_grid.tempTetro.position.y);
+                        colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.position.x - 1, player.currentTetro.position.y);
                         if (colision == 0)
-                            real_grid.tempTetro.moveLeft();
+                            player.currentTetro.moveLeft();
                     }
 
                     if (event.key.code == sf::Keyboard::D)
                     {
-                        colision = real_grid.check_collision(real_grid.tempTetro, real_grid.tempTetro.position.x + 1, real_grid.tempTetro.position.y);
+                        colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.position.x + 1, player.currentTetro.position.y);
                         if (colision == 0)
-                            real_grid.tempTetro.moveRight();
+                            player.currentTetro.moveRight();
                     }
 
                     if (event.key.code == sf::Keyboard::Z)
                     {
-                        real_grid.tempTetro.rotate();
+                        player.currentTetro.rotate();
                     }
                 }
                 if (event.type == sf::Event::Closed)
@@ -80,13 +81,14 @@ namespace game
             if (gameClock.getElapsedTime().asSeconds() >= 0.5f )
             {
                 gameClock.restart();
-                colision = real_grid.check_collision(real_grid.tempTetro, real_grid.tempTetro.position.x, real_grid.tempTetro.position.y + 1);
+                colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.position.x, player.currentTetro.position.y + 1);
                 if (colision == 0)
-                    real_grid.tempTetro.moveDown();
+                    player.currentTetro.moveDown();
                 else if (colision == 2)
                 {
-                    real_grid.lockTetroInGrid(real_grid.tempTetro);
-                    real_grid.generateTetro();  
+                    player.lockTetroInGrid(player.currentTetro);
+                    player.currentTetro = player.nextTetro;
+                    player.generateTetro(player.nextTetro);
                 }
             }
             _window.display();
@@ -111,7 +113,7 @@ namespace game
             _window.draw(logo_sprite);
         }
 
-        real_grid.drawGrid(_window);
+        player.playerGrid.drawGrid(_window, player.currentTetro);
     }
 
     bool checkCollision(const sf::RectangleShape &a, const sf::RectangleShape &b)

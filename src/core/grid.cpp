@@ -39,7 +39,7 @@ int Grid::check_collision(const Tetro &tetro, int futureX, int futureY) const
                 }
                 
                 int indx_bottom = (tetro.position.y +1 + i) * columns + cibleX;
-                if (cells[indx_bottom] != 0 && cells[indx_bottom] != 1)
+                if (cells[indx_bottom] != 0 && cells[indx_bottom] != 1 || cibleY >= rows)
                 {
                     return 2; // Collision when moving down onto locked pieces
                 }
@@ -85,9 +85,9 @@ void Grid::update_with_tetro(const Tetro &tetro, int state)
     }
 }
 
-void Grid::drawGrid(sf::RenderWindow &window)
+void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
 {
-    this->update_with_tetro(this->tempTetro, 1);
+    this->update_with_tetro(currentTetro, 1);
     int rows = this->rows;
     int cols = this->columns;
     int cellSize = this->cellSize;
@@ -116,7 +116,7 @@ void Grid::drawGrid(sf::RenderWindow &window)
             if (val == 0)
                 cellShape.setFillColor(sf::Color::Black);
             else if (val == 1)
-                cellShape.setFillColor(this->tempTetro.color); // active piece with its color
+                cellShape.setFillColor(currentTetro.color); // active piece with its color
             else if (val != 0 && val != 1)
             {
                 switch (val)
@@ -148,51 +148,4 @@ void Grid::drawGrid(sf::RenderWindow &window)
             window.draw(cellShape);
         }
     }
-}
-
-void Grid::generateTetro()
-{
-    if (tetroList.empty())
-    {
-        tetroList = std::vector<TetroType>(TETRO_BAG.begin(), TETRO_BAG.end());
-    }
-    int randomIndex = rand() % tetroList.size();
-    TetroType selectedType = tetroList[randomIndex];
-    tetroList.erase(tetroList.begin() + randomIndex);
-
-    switch (selectedType)
-    {
-    case TetroType::I:
-        tempTetro = TetroI();
-        break;
-    case TetroType::J:
-        tempTetro = TetroJ();
-        break;
-    case TetroType::L:
-        tempTetro = TetroL();
-        break;
-    case TetroType::O:
-        tempTetro = TetroO();
-        break;
-    case TetroType::S:
-        tempTetro = TetroS();
-        break;
-    case TetroType::T:
-        tempTetro = TetroT();
-        break;
-    case TetroType::Z:
-        tempTetro = TetroZ();
-        break;
-    default:
-        tempTetro = TetroI();
-        break;
-    }
-
-    tempTetro.setPosition(columns / 2 - 2, 0);
-}
-
-void Grid::lockTetroInGrid(const Tetro &tetro)
-{
-    update_with_tetro(tetro, tetro.colorRef);
-    generateTetro();
 }

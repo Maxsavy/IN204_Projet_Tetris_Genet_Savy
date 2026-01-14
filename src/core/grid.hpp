@@ -19,9 +19,6 @@ public:
     int columns;
     int cellSize;
     std::vector<int> cells;
-    // initialize tetro
-    Tetro tempTetro;
-    std::vector<TetroType> tetroList;
 
     Grid() : rows(20), columns(10), cellSize(8)
     {
@@ -38,9 +35,7 @@ public:
     void display_terminal() const;
     int check_collision(const Tetro &tetro, int futureX, int FutureY) const;
     void update_with_tetro(const Tetro &tetro, int state);
-    void drawGrid(sf::RenderWindow &window);
-    void generateTetro();
-    void lockTetroInGrid(const Tetro &tetro);
+    void drawGrid(sf::RenderWindow &window, const Tetro &currentTetro);
 
     ~Grid()
     {

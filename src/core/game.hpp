@@ -1,5 +1,8 @@
+#ifndef GAME_HPP
+#define GAME_HPP
+
 #include <SFML/Graphics.hpp>
-#include "grid.hpp"
+#include "player.hpp"
 #include <list>
 #include <random>
 #include <string>
@@ -40,7 +43,7 @@ namespace game
     {
     public:
         GameController(sf::RenderWindow &w);
-        Grid real_grid;
+        Player player;
         sf::Clock gameClock;
 
         void start();
@@ -69,3 +72,5 @@ namespace game
     }; // class game
 
 } // namespace game
+
+#endif // GAME_HPP
