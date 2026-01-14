@@ -14,9 +14,8 @@ void Grid::display_terminal() const
     }
 }
 
-int Grid::check_collision(const Tetro &tetro, int futureX, int futureY) const
+int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int futureY) const
 {
-    const auto &shape = tetro.getShape();
 
     for (int i = 0; i < 4; i++)
     {
@@ -64,7 +63,7 @@ void Grid::update_with_tetro(const Tetro &tetro, int state)
             cells[i] = 0;
     }
 
-    const auto &shape = tetro.getShape();
+    const auto &shape = tetro.getShape(0);
 
     for (int i = 0; i < 4; i++)
     {
@@ -92,7 +91,7 @@ void Grid::delete_full_rows()
         bool isFull = true;
         for (int j = 0; j < columns; j++)
         {
-            if (cells[i * columns + j] == 0)
+            if (cells[i * columns + j] == 0 || cells[i * columns + j] == 1)
             {
                 isFull = false;
                 break;

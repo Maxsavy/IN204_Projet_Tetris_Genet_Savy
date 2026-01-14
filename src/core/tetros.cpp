@@ -95,9 +95,9 @@ void Tetro::moveRight()
 }
 
 
-const std::array<std::array<int, 4>, 4> &Tetro::getShape() const
+const std::array<std::array<int, 4>, 4> &Tetro::getShape(int i) const
 {
-    return rotations[currentRotation];
+    return rotations[(currentRotation+i) % 4];
 }
 
 void Tetro::setPosition(int gridX, int gridY)

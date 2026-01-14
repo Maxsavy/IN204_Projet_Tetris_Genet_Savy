@@ -30,7 +30,7 @@ public:
     void moveDown();
     void moveLeft();
     void moveRight();
-    const std::array<std::array<int, 4>, 4> &getShape() const;
+    const std::array<std::array<int, 4>, 4> &getShape(int i) const;
     void setPosition(int x, int y);
 
 protected:
