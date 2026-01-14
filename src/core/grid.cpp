@@ -85,6 +85,39 @@ void Grid::update_with_tetro(const Tetro &tetro, int state)
     }
 }
 
+void Grid::delete_full_rows()
+{
+    for (int i = 0; i < rows; i++)
+    {
+        bool isFull = true;
+        for (int j = 0; j < columns; j++)
+        {
+            if (cells[i * columns + j] == 0)
+            {
+                isFull = false;
+                break;
+            }
+        }
+
+        if (isFull)
+        {
+            // Move all rows above down by one
+            for (int k = i; k > 0; k--)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    cells[k * columns + j] = cells[(k - 1) * columns + j];
+                }
+            }
+            // Clear the top row
+            for (int j = 0; j < columns; j++)
+            {
+                cells[j] = 0;
+            }
+        }
+    }
+}
+
 void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
 {
     this->update_with_tetro(currentTetro, 1);
