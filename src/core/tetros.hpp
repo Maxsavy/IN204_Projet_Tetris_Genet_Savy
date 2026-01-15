@@ -27,7 +27,7 @@ public:
     int colorRef;
 
     void rotate();
-    void moveDown();
+    void moveDown(int i);
     void moveLeft();
     void moveRight();
     const std::array<std::array<int, 4>, 4> &getShape(int i) const;

@@ -16,6 +16,11 @@ void Grid::display_terminal() const
 
 int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int futureY) const
 {
+    // fonction de gestion des collisions pour les 4 cas suivantts:
+    // 0: pas de collision
+    // 1: collision mur gauche/droite ou piece verouillée
+    // 2: collision sol ou piece verouillée en descendant
+    // 3: collision plafond 
 
     for (int i = 0; i < 4; i++)
     {
@@ -26,28 +31,32 @@ int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4
                 int cibleX = futureX + j;
                 int cibleY = futureY + i;
 
-                // Check boundaries
+                // Check des collisions
+
                 if (cibleX < 0 || cibleX >= columns)
                 {
-                    return 1; // Collision with walls or floor
+                    return 1; // Collisions avec les murs
                 }
 
                 if (cibleY >= rows)
                 {
-                    return 2; // Collision with floor
+                    return 2; // Collision avec le sol
                 }
                 
                 int indx_bottom = (tetro.position.y +1 + i) * columns + cibleX;
                 if (cells[indx_bottom] != 0 && cells[indx_bottom] != 1)
                 {
-                    return 2; // Collision when moving down onto locked pieces
+                    if (tetro.position.y < 1)
+                        return 3;      // Collision avec le plafond
+                    return 2; // Collision avec une pièce lockée en dessous
                 }
 
                 int indx = cibleY * columns + cibleX;
                 if (cells[indx] != 0 && cells[indx] != 1)
                 {
-                    return 1; // Collision with locked pieces
+                    return 1; // Collision avec une pièce lockée sur les côtés
                 }
+
                 
             }   
         }
@@ -120,7 +129,7 @@ void Grid::delete_full_rows()
 void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
 {
     this->update_with_tetro(currentTetro, 1);
-    int rows = this->rows;
+    int rows = this->rows-2;
     int cols = this->columns;
     int cellSize = this->cellSize;
     float pixelSize = static_cast<float>(cellSize * RESIZE_FACTOR);
@@ -140,7 +149,7 @@ void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
             float x = originX + j * pixelSize;
             float y = originY + i * pixelSize;
             cellShape.setPosition(x, y);
-            int idx = j + i * cols;
+            int idx = j + (i+2) * cols;
             int val = 0;
             if (idx >= 0 && idx < static_cast<int>(this->cells.size()))
                 val = this->cells[idx];

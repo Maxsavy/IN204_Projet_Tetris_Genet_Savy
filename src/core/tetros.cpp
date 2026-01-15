@@ -79,9 +79,9 @@ void Tetro::rotate()
     currentRotation = (currentRotation + 1) % 4;
 }
 
-void Tetro::moveDown()
+void Tetro::moveDown(int i)
 {
-    position.y += 1;
+    position.y += i;
 }
 
 void Tetro::moveLeft()

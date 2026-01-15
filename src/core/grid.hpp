@@ -20,7 +20,7 @@ public:
     int cellSize;
     std::vector<int> cells;
 
-    Grid() : rows(20), columns(10), cellSize(8)
+    Grid() : rows(22), columns(10), cellSize(8)
     {
         cells = std::vector<int>(rows * columns);
         for (int i = 0; i < rows; i++)

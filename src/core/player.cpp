@@ -38,7 +38,7 @@ void Player::generateTetro( Tetro &tempTetro)
         break;
     }
 
-    tempTetro.setPosition(COLUMNS / 2 - 2, 0);
+    tempTetro.setPosition(COLUMNS / 2 - 2, -1);
 }
 
 void Player::lockTetroInGrid(const Tetro &tetro)

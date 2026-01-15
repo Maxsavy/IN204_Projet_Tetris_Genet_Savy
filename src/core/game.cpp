@@ -76,24 +76,38 @@ namespace game
                 }
                 if (event.type == sf::Event::Closed)
                 {
+                    game::MainMenu menu(_window);
+                    menu.start();
                     exit(0);
                 }
             } // event loop
 
+            
             if (gameClock.getElapsedTime().asSeconds() >= 0.5f )
             {
                 gameClock.restart();
                 colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x, player.currentTetro.position.y + 1);
-                if (colision == 0)
-                    player.currentTetro.moveDown();
+                if (colision == 0){
+                    player.currentTetro.moveDown(1);
+                }
+                    
                 else if (colision == 2)
                 {
                     player.lockTetroInGrid(player.currentTetro);
                     player.currentTetro = player.nextTetro;
                     player.generateTetro(player.nextTetro);
+                    player.currentTetro.moveDown(2);
                 }
+                else if (colision == 3)
+                {
+                    gameOver();
+                }   
             }
-            player.playerGrid.delete_full_rows();
+            if (gameClock.getElapsedTime().asSeconds() >= 0.3f)
+            {
+                player.playerGrid.delete_full_rows();
+            }
+            
             _window.display();
             _window.setFramerateLimit(60);
         }
@@ -119,10 +133,20 @@ namespace game
         player.playerGrid.drawGrid(_window, player.currentTetro);
     }
 
-    bool checkCollision(const sf::RectangleShape &a, const sf::RectangleShape &b)
+
+    void GameController::gameOver()
     {
-        return a.getGlobalBounds().intersects(b.getGlobalBounds());
+        game::MainMenu menu(_window);
+        menu.start();
+        exit(0);
     }
+
+    // Mis en commentaire car je pense que c'est inutile
+
+    // bool checkCollision(const sf::RectangleShape &a, const sf::RectangleShape &b)
+    // {
+    //     return a.getGlobalBounds().intersects(b.getGlobalBounds());
+    // }
 
     sf::RectangleShape getRectangleAt(sf::Vector2f location, sf::Color color)
     {
