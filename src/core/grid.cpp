@@ -46,7 +46,7 @@ int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4
                 int indx_bottom = (tetro.position.y +1 + i) * columns + cibleX;
                 if (cells[indx_bottom] != 0 && cells[indx_bottom] != 1)
                 {
-                    if (tetro.position.y < 1)
+                    if (tetro.position.y - 1 < 1)
                         return 3;      // Collision avec le plafond
                     return 2; // Collision avec une pièce lockée en dessous
                 }
