@@ -28,7 +28,7 @@ namespace game
             while (_window.pollEvent(event))
             {
                 if (event.type == sf::Event::Closed ||
-                    (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape))
+                    (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
                 {
                     _is_exit_requested = true;
                     break;

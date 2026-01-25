@@ -1,5 +1,5 @@
-#ifndef ROTATIONS_HPP
-#define ROTATIONS_HPP
+#ifndef PIECES_HPP
+#define PIECES_HPP
 
 #include <vector>
 #include <SFML/Graphics.hpp>
@@ -53,4 +53,10 @@ const int L_PIECE[4][4][4] = {
     {{0, 0, 0, 0}, {0, 0, 0, 0}, {1, 1, 1, 0}, {1, 0, 0, 0}},
     {{0, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}}};
 
-#endif // ROTATIONS_HPP
+const std::array<TetroType, 14> TETRO_BAG = {
+    TetroType::I, TetroType::J, TetroType::L, TetroType::O,
+    TetroType::S, TetroType::T, TetroType::Z,
+    TetroType::I, TetroType::J, TetroType::L, TetroType::O,
+    TetroType::S, TetroType::T, TetroType::Z};
+
+#endif // PIECES_HPP

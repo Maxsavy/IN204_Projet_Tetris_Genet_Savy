@@ -24,9 +24,13 @@ public:
     sf::Vector2i position;
     int currentRotation;
     sf::Color color;
+    int colorRef;
 
     void rotate();
-    const std::array<std::array<int, 4>, 4> &getShape() const;
+    void moveDown(int i);
+    void moveLeft();
+    void moveRight();
+    const std::array<std::array<int, 4>, 4> &getShape(int i) const;
     void setPosition(int x, int y);
 
 protected:
