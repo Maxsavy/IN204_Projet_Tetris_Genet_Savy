@@ -130,9 +130,10 @@ void Grid::drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro)
     float mainGridW = static_cast<float>(COLUMNS) * pixelSize;
     float mainGridH = static_cast<float>(ROWS - 2) * pixelSize;
     float mainOriginX = (static_cast<float>(window.getSize().x) - mainGridW) / 2.f;
+    float mainOriginY = (static_cast<float>(window.getSize().y) - mainGridH) / 2.f;
 
-    float nextGridOffsetX = mainOriginX + mainGridW + 20.f;
-    float nextGridOffsetY = mainOriginX;
+    float nextGridOffsetX = mainOriginX + mainGridW + 30.f;
+    float nextGridOffsetY = mainOriginY + mainGridH / 2.f - (4 * pixelSize) / 2.f;
 
     nextTetro.setPosition(1, -1);
     drawGrid(window, nextTetro, 8, 6, nextGridOffsetX, nextGridOffsetY);
