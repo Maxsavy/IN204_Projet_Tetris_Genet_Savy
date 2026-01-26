@@ -126,41 +126,37 @@ void Grid::delete_full_rows()
 
 void Grid::drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro)
 {
+
     float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
     float mainGridW = static_cast<float>(COLUMNS) * pixelSize;
     float mainGridH = static_cast<float>(ROWS - 2) * pixelSize;
     float mainOriginX = (static_cast<float>(window.getSize().x) - mainGridW) / 2.f;
     float mainOriginY = (static_cast<float>(window.getSize().y) - mainGridH) / 2.f;
-
     float nextGridOffsetX = mainOriginX + mainGridW + 30.f;
     float nextGridOffsetY = mainOriginY + mainGridH / 2.f - (4 * pixelSize) / 2.f;
 
     nextTetro.setPosition(1, -1);
-    drawGrid(window, nextTetro, 8, 6, nextGridOffsetX, nextGridOffsetY);
+    this->update_with_tetro(nextTetro, 1);
+    drawGrid(window, nextTetro, 6, 6, nextGridOffsetX, nextGridOffsetY, pixelSize);
     nextTetro.setPosition(3, -1);
 }
 
-void Grid::drawGrid(sf::RenderWindow &window, const Tetro &tetro, int rows, const int cols, float offsetX, float offsetY)
+void Grid::drawGameGrid(sf::RenderWindow &window, const Tetro &tetro, int rows, const int cols)
 {
     this->update_with_tetro(tetro, 1);
     rows = rows - 2;
     int cellSize = this->cellSize;
-    float pixelSize = static_cast<float>(cellSize * RESIZE_FACTOR);
-    float targetW = static_cast<float>(cols) * pixelSize;
-    float targetH = static_cast<float>(rows) * pixelSize;
+    float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
+    float mainGridW = static_cast<float>(cols) * pixelSize;
+    float mainGridH = static_cast<float>(rows - 2) * pixelSize;
+    float mainOriginX = (static_cast<float>(window.getSize().x) - mainGridW) / 2.f;
+    float mainOriginY = (static_cast<float>(window.getSize().y) - mainGridH) / 2.f;
 
-    float originX, originY;
-    if (offsetX == 0.f && offsetY == 0.f)
-    {
-        originX = (static_cast<float>(window.getSize().x) - targetW) / 2.f;
-        originY = (static_cast<float>(window.getSize().y) - targetH) / 2.f;
-    }
-    else
-    {
-        originX = offsetX;
-        originY = offsetY;
-    }
+    drawGrid(window, tetro, rows, cols, mainOriginX, mainOriginY, pixelSize);
+}
 
+void Grid::drawGrid(sf::RenderWindow &window, const Tetro &tetro, int rows, const int cols, float originX, float originY, float pixelSize)
+{
     sf::RectangleShape cellShape(sf::Vector2f(pixelSize, pixelSize));
     cellShape.setOutlineThickness(1.f);
     cellShape.setOutlineColor(sf::Color(100, 100, 100));

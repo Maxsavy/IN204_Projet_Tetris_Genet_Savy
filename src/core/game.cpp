@@ -130,7 +130,7 @@ namespace game
             _window.draw(logo_sprite);
         }
 
-        player.playerGrid.drawGrid(_window, player.currentTetro, player.playerGrid.rows, player.playerGrid.columns);
+        player.playerGrid.drawGameGrid(_window, player.currentTetro, player.playerGrid.rows, player.playerGrid.columns);
         player.playerGrid.drawNextGrid(_window, player.nextTetro);
     }
 

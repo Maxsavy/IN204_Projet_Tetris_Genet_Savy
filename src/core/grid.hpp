@@ -33,10 +33,11 @@ public:
     }
 
     void display_terminal() const;
-    int check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int FutureY) const;
+    int check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int futureY) const;
     void update_with_tetro(const Tetro &tetro, int state);
     void delete_full_rows();
-    void drawGrid(sf::RenderWindow &window, const Tetro &currentTetro, const int rows, const int cols, float offsetX = 0.f, float offsetY = 0.f);
+    void drawGrid(sf::RenderWindow &window, const Tetro &currentTetro, const int rows, const int cols, float originX = 0.f, float originY = 0.f, float pixelSize = CELL_SIZE * RESIZE_FACTOR);
+    void drawGameGrid(sf::RenderWindow &window, const Tetro &currentTetro, const int rows, const int cols);
     void drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro);
 
     ~Grid()
