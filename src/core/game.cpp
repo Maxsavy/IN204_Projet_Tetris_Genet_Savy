@@ -137,8 +137,7 @@ namespace game
     void GameController::gameOver()
     {
         game::MainMenu menu(_window);
-        menu.start();
-        exit(0);
+        menu.showGameOverMenu();
     }
 
     sf::RectangleShape getRectangleAt(sf::Vector2f location, sf::Color color)

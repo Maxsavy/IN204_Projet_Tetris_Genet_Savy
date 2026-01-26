@@ -9,7 +9,7 @@ namespace game
     sf::Sprite background_sprite;
 
     MainMenu::MainMenu(sf::RenderWindow &w)
-        : _window(w), _main_menu_context(nullptr, menu_destroy_context)
+        : _window(w), _main_menu_context(nullptr, menu_destroy_context), _game_over_menu_context(nullptr, menu_destroy_context)
     {
         setup_menu_context();
     }
@@ -17,6 +17,7 @@ namespace game
     void MainMenu::start()
     {
         _window.setFramerateLimit(144);
+        _current_menu = _main_menu_context.get();
         while (_window.isOpen())
         {
             if (_is_exit_requested)
@@ -43,6 +44,35 @@ namespace game
             menu_render(_current_menu);
             _window.display();
         }
+    }
+
+    void MainMenu::showGameOverMenu()
+    {
+        _return_to_main_menu = false;
+        _current_menu = _game_over_menu_context.get();
+        _window.setFramerateLimit(144);
+        while (_window.isOpen() && !_return_to_main_menu)
+        {
+            sf::Event event;
+            while (_window.pollEvent(event))
+            {
+                if (event.type == sf::Event::Closed ||
+                    (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+                {
+                    _return_to_main_menu = true;
+                    break;
+                }
+                menu_handle_event(_current_menu, event);
+            }
+            _window.clear();
+            if (background.getSize().x > 0 && background.getSize().y > 0)
+            {
+                _window.draw(background_sprite);
+            }
+            menu_render(_current_menu);
+            _window.display();
+        }
+        _current_menu = _main_menu_context.get();
     }
 
     void MainMenu::setup_menu_context()
@@ -111,5 +141,49 @@ namespace game
             .title = " Tetris ouiii", .items = items, .style = style};
         _main_menu_context.reset(create_menu_context(_window, config));
         _current_menu = _main_menu_context.get();
+
+        setup_game_over_menu();
+    }
+
+    void MainMenu::setup_game_over_menu()
+    {
+        game_menu::Style style{.TitleFont = &_font,
+                               .ItemFont = &_font,
+                               .TitleFontSize = 50,
+                               .ItemFontSize = 35,
+                               .MenuTitleScaleFactor = 1,
+                               .MenuItemScaleFactor = 1.5,
+                               .colorScheme = {.titleColor = 0xFFFFFF,
+                                               .itemColor = 0xFFFFFF,
+                                               .selectedColor = 0xFF22F1},
+                               .PaddingTitle =
+                                   {
+                                       .top = 100,
+                                       .left = 0,
+                                   },
+                               .PaddingItems =
+                                   {
+                                       .top = 30,
+                                   },
+                               .TitleAlign = game_menu::Align::Center,
+                               .ItemAlign = game_menu::Align::Center};
+
+        std::vector<game_menu::MenuItem> items{
+            {"Replay",
+             [&](sf::RenderTarget &target)
+             {
+                 game::GameController gameController(_window);
+                 gameController.start();
+             }},
+            {"Return  to  Menu", [&](sf::RenderTarget &target)
+             {
+                 //  _return_to_main_menu = true;
+                 _current_menu = _main_menu_context.get();
+                 start();
+             }}};
+
+        game_menu::MenuConfig config{
+            .title = " Game Over", .items = items, .style = style};
+        _game_over_menu_context.reset(create_menu_context(_window, config));
     }
 }
