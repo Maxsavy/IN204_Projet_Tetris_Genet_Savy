@@ -93,7 +93,7 @@ void Grid::update_with_tetro(const Tetro &tetro, int state)
     }
 }
 
-void Grid::delete_full_rows()
+void Grid::delete_full_rows(int &nbDestroyedLines)
 {
     for (int i = 0; i < rows; i++)
     {
@@ -109,6 +109,7 @@ void Grid::delete_full_rows()
 
         if (isFull)
         {
+            nbDestroyedLines++;
             // Move all rows above down by one
             for (int k = i; k > 0; k--)
             {

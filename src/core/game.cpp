@@ -1,6 +1,9 @@
 #include <iostream>
 #include "game.hpp"
 #include "../ui/menu.hpp"
+
+#define LOCK_TIME 0.5f
+
 namespace game
 {
     // constructor
@@ -28,6 +31,9 @@ namespace game
     void GameController::gameLoop()
     {
         bool loopInvarient = true;
+        sf::Time paceTime = sf::seconds(0.5f);
+        int score = 0;
+
         float scaleX = static_cast<float>(_window.getSize().x);
         float scaleY = static_cast<float>(_window.getSize().y);
         while (loopInvarient)
@@ -83,7 +89,7 @@ namespace game
             } // event loop
 
             
-            if (gameClock.getElapsedTime().asSeconds() >= 0.5f )
+            if (gameClock.getElapsedTime().asSeconds() >= paceTime.asSeconds()) 
             {
                 gameClock.restart();
                 colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x, player.currentTetro.position.y + 1);
@@ -93,6 +99,7 @@ namespace game
                     
                 else if (colision == 2)
                 {
+                    sf::sleep(sf::milliseconds(500));
                     player.lockTetroInGrid(player.currentTetro);
                     player.currentTetro = player.nextTetro;
                     player.generateTetro(player.nextTetro);
@@ -105,9 +112,10 @@ namespace game
             }
             if (gameClock.getElapsedTime().asSeconds() >= 0.3f)
             {
-                player.playerGrid.delete_full_rows();
+                player.playerGrid.delete_full_rows(score);
+                std::cout << "Score: " << score << std::endl;
             }
-            
+            paceTime = sf::seconds(0.5f - (static_cast<float>(score) * 0.08f));
             _window.display();
             _window.setFramerateLimit(60);
         }
