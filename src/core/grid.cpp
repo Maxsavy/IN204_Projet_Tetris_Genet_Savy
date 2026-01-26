@@ -124,7 +124,7 @@ void Grid::delete_full_rows()
     }
 }
 
-void Grid::drawNextGrid(sf::RenderWindow &window, const Tetro &nextTetro)
+void Grid::drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro)
 {
     float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
     float mainGridW = static_cast<float>(COLUMNS) * pixelSize;
@@ -134,7 +134,9 @@ void Grid::drawNextGrid(sf::RenderWindow &window, const Tetro &nextTetro)
     float nextGridOffsetX = mainOriginX + mainGridW + 20.f;
     float nextGridOffsetY = mainOriginX;
 
+    nextTetro.setPosition(1, -1);
     drawGrid(window, nextTetro, 8, 6, nextGridOffsetX, nextGridOffsetY);
+    nextTetro.setPosition(3, -1);
 }
 
 void Grid::drawGrid(sf::RenderWindow &window, const Tetro &tetro, int rows, const int cols, float offsetX, float offsetY)
