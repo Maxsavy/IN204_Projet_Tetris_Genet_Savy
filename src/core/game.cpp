@@ -70,7 +70,7 @@ namespace game
                     if (event.key.code == sf::Keyboard::Z)
                     {
                         colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(1), player.currentTetro.position.x, player.currentTetro.position.y);
-                        if (colision == 0)  
+                        if (colision == 0)
                             player.currentTetro.rotate();
                     }
                 }
@@ -82,15 +82,15 @@ namespace game
                 }
             } // event loop
 
-            
-            if (gameClock.getElapsedTime().asSeconds() >= 0.5f )
+            if (gameClock.getElapsedTime().asSeconds() >= 0.5f)
             {
                 gameClock.restart();
                 colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x, player.currentTetro.position.y + 1);
-                if (colision == 0){
+                if (colision == 0)
+                {
                     player.currentTetro.moveDown(1);
                 }
-                    
+
                 else if (colision == 2)
                 {
                     player.lockTetroInGrid(player.currentTetro);
@@ -101,13 +101,13 @@ namespace game
                 else if (colision == 3)
                 {
                     gameOver();
-                }   
+                }
             }
             if (gameClock.getElapsedTime().asSeconds() >= 0.3f)
             {
                 player.playerGrid.delete_full_rows();
             }
-            
+
             _window.display();
             _window.setFramerateLimit(60);
         }
@@ -130,9 +130,9 @@ namespace game
             _window.draw(logo_sprite);
         }
 
-        player.playerGrid.drawGrid(_window, player.currentTetro);
+        player.playerGrid.drawGrid(_window, player.currentTetro, player.playerGrid.rows, player.playerGrid.columns);
+        player.playerGrid.drawNextGrid(_window, player.nextTetro);
     }
-
 
     void GameController::gameOver()
     {
@@ -140,13 +140,6 @@ namespace game
         menu.start();
         exit(0);
     }
-
-    // Mis en commentaire car je pense que c'est inutile
-
-    // bool checkCollision(const sf::RectangleShape &a, const sf::RectangleShape &b)
-    // {
-    //     return a.getGlobalBounds().intersects(b.getGlobalBounds());
-    // }
 
     sf::RectangleShape getRectangleAt(sf::Vector2f location, sf::Color color)
     {
@@ -159,16 +152,12 @@ namespace game
 
     void GameController::loadResources()
     {
-        // background loading and padding
         loadTexture(background, "assets/images/background_game.jpg", background_sprite);
 
-        // grid loading and padding
         loadTexture(grid, "assets/images/tetris_grid.png", grid_sprite);
 
-        // logo loading and padding
         loadTexture(logo, "assets/images/tetris_logo.png", logo_sprite);
 
-        // font loading
         if (!font.loadFromFile("assets/fonts/arcade.ttf"))
         {
             std::cerr << "Failed to load font: arcade.ttf" << std::endl;

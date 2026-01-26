@@ -1,7 +1,7 @@
 #include <iostream>
 #include "player.hpp"
 
-void Player::generateTetro( Tetro &tempTetro)
+void Player::generateTetro(Tetro &tempTetro)
 {
     if (tetroList.empty())
     {

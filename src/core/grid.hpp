@@ -36,7 +36,8 @@ public:
     int check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int FutureY) const;
     void update_with_tetro(const Tetro &tetro, int state);
     void delete_full_rows();
-    void drawGrid(sf::RenderWindow &window, const Tetro &currentTetro);
+    void drawGrid(sf::RenderWindow &window, const Tetro &currentTetro, const int rows, const int cols, float offsetX = 0.f, float offsetY = 0.f);
+    void drawNextGrid(sf::RenderWindow &window, const Tetro &nextTetro);
 
     ~Grid()
     {

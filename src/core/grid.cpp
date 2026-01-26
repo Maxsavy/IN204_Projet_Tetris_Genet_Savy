@@ -20,7 +20,7 @@ int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4
     // 0: pas de collision
     // 1: collision mur gauche/droite ou piece verouillée
     // 2: collision sol ou piece verouillée en descendant
-    // 3: collision plafond 
+    // 3: collision plafond
 
     for (int i = 0; i < 4; i++)
     {
@@ -42,13 +42,13 @@ int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4
                 {
                     return 2; // Collision avec le sol
                 }
-                
-                int indx_bottom = (tetro.position.y +1 + i) * columns + cibleX;
+
+                int indx_bottom = (tetro.position.y + 1 + i) * columns + cibleX;
                 if (cells[indx_bottom] != 0 && cells[indx_bottom] != 1)
                 {
                     if (tetro.position.y - 1 < 1)
-                        return 3;      // Collision avec le plafond
-                    return 2; // Collision avec une pièce lockée en dessous
+                        return 3; // Collision avec le plafond
+                    return 2;     // Collision avec une pièce lockée en dessous
                 }
 
                 int indx = cibleY * columns + cibleX;
@@ -56,9 +56,7 @@ int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4
                 {
                     return 1; // Collision avec une pièce lockée sur les côtés
                 }
-
-                
-            }   
+            }
         }
     }
     return 0; // No collision
@@ -126,17 +124,39 @@ void Grid::delete_full_rows()
     }
 }
 
-void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
+void Grid::drawNextGrid(sf::RenderWindow &window, const Tetro &nextTetro)
 {
-    this->update_with_tetro(currentTetro, 1);
-    int rows = this->rows-2;
-    int cols = this->columns;
+    float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
+    float mainGridW = static_cast<float>(COLUMNS) * pixelSize;
+    float mainGridH = static_cast<float>(ROWS - 2) * pixelSize;
+    float mainOriginX = (static_cast<float>(window.getSize().x) - mainGridW) / 2.f;
+
+    float nextGridOffsetX = mainOriginX + mainGridW + 20.f;
+    float nextGridOffsetY = mainOriginX;
+
+    drawGrid(window, nextTetro, 8, 6, nextGridOffsetX, nextGridOffsetY);
+}
+
+void Grid::drawGrid(sf::RenderWindow &window, const Tetro &tetro, int rows, const int cols, float offsetX, float offsetY)
+{
+    this->update_with_tetro(tetro, 1);
+    rows = rows - 2;
     int cellSize = this->cellSize;
     float pixelSize = static_cast<float>(cellSize * RESIZE_FACTOR);
     float targetW = static_cast<float>(cols) * pixelSize;
     float targetH = static_cast<float>(rows) * pixelSize;
-    float originX = (static_cast<float>(window.getSize().x) - targetW) / 2.f;
-    float originY = (static_cast<float>(window.getSize().y) - targetH) / 2.f;
+
+    float originX, originY;
+    if (offsetX == 0.f && offsetY == 0.f)
+    {
+        originX = (static_cast<float>(window.getSize().x) - targetW) / 2.f;
+        originY = (static_cast<float>(window.getSize().y) - targetH) / 2.f;
+    }
+    else
+    {
+        originX = offsetX;
+        originY = offsetY;
+    }
 
     sf::RectangleShape cellShape(sf::Vector2f(pixelSize, pixelSize));
     cellShape.setOutlineThickness(1.f);
@@ -149,7 +169,8 @@ void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
             float x = originX + j * pixelSize;
             float y = originY + i * pixelSize;
             cellShape.setPosition(x, y);
-            int idx = j + (i+2) * cols;
+            int rowOffset = (cols == 6) ? -2 : 2;
+            int idx = j + (i + rowOffset) * this->columns;
             int val = 0;
             if (idx >= 0 && idx < static_cast<int>(this->cells.size()))
                 val = this->cells[idx];
@@ -157,7 +178,7 @@ void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
             if (val == 0)
                 cellShape.setFillColor(sf::Color::Black);
             else if (val == 1)
-                cellShape.setFillColor(currentTetro.color); // active piece with its color
+                cellShape.setFillColor(tetro.color); // active piece with its color
             else if (val != 0 && val != 1)
             {
                 switch (val)
@@ -167,7 +188,7 @@ void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
                     break;
                 case 3:
                     cellShape.setFillColor(sf::Color::Blue); // J piece
-                    break;  
+                    break;
                 case 4:
                     cellShape.setFillColor(sf::Color(255, 165, 0)); // L piece
                     break;
@@ -185,7 +206,7 @@ void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
                     break;
                 }
             }
-                
+
             window.draw(cellShape);
         }
     }
