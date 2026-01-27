@@ -35,14 +35,3 @@ target_link_libraries(tetris PRIVATE
     sfml-network
     gamemenu 
 )
-
-# --- Executable 2: Unit Tests on Grid---
-
-add_executable(window src/core/window_grid.cpp src/core/grid.cpp)
-target_compile_features(window PRIVATE cxx_std_17)
-
-target_link_libraries(window PRIVATE 
-    sfml-graphics
-    sfml-audio
-    sfml-network
-)

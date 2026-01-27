@@ -14,6 +14,10 @@ constexpr int RESIZE_FACTOR = 4;
 class Grid
 {
 
+private:
+    sf::Clock lockingDelayClock;
+    bool locking = false;
+
 public:
     int rows;
     int columns;
@@ -32,14 +36,17 @@ public:
         }
     }
 
-    void display_terminal() const;
-    int check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int FutureY) const;
+    // void display_terminal() const;
     void update_with_tetro(const Tetro &tetro, int state);
+    void start_locking_timer();
+    void cancel_locking_timer();
+    bool locking_tetro(const Tetro &tetro, int move_count);
+    int check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int FutureY);
+    void update_with_ghost_tetro(const Tetro &tetro, int state);
     void delete_full_rows(int &nbDestroyedLines);
     void drawGrid(sf::RenderWindow &window, const Tetro &currentTetro);
 
     ~Grid()
-    {
-    }
+    {}
 };
 #endif // GRID_HPP

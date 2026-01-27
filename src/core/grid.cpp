@@ -2,6 +2,7 @@
 #include "tetros.hpp"
 #include <iostream>
 
+/* Fonction de test de l'affichage de la grille dans le terminal 
 void Grid::display_terminal() const
 {
     for (int i = 0; i < rows; i++)
@@ -13,56 +14,7 @@ void Grid::display_terminal() const
         std::cout << std::endl;
     }
 }
-
-int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int futureY) const
-{
-    // fonction de gestion des collisions pour les 4 cas suivantts:
-    // 0: pas de collision
-    // 1: collision mur gauche/droite ou piece verouillée
-    // 2: collision sol ou piece verouillée en descendant
-    // 3: collision plafond 
-
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            if (shape[i][j] == 1)
-            {
-                int cibleX = futureX + j;
-                int cibleY = futureY + i;
-
-                // Check des collisions
-
-                if (cibleX < 0 || cibleX >= columns)
-                {
-                    return 1; // Collisions avec les murs
-                }
-
-                if (cibleY >= rows)
-                {
-                    return 2; // Collision avec le sol
-                }
-                
-                int indx_bottom = (tetro.position.y +1 + i) * columns + cibleX;
-                if (cells[indx_bottom] != 0 && cells[indx_bottom] != 1)
-                {
-                    if (tetro.position.y - 1 < 1)
-                        return 3;      // Collision avec le plafond
-                    return 2; // Collision avec une pièce lockée en dessous
-                }
-
-                int indx = cibleY * columns + cibleX;
-                if (cells[indx] != 0 && cells[indx] != 1)
-                {
-                    return 1; // Collision avec une pièce lockée sur les côtés
-                }
-
-                
-            }   
-        }
-    }
-    return 0; // No collision
-}
+*/
 
 void Grid::update_with_tetro(const Tetro &tetro, int state)
 {
@@ -82,6 +34,140 @@ void Grid::update_with_tetro(const Tetro &tetro, int state)
             {
                 int gridX = tetro.position.x + j;
                 int gridY = tetro.position.y + i;
+
+                if (gridX >= 0 && gridX < columns && gridY >= 0 && gridY < rows)
+                {
+                    int idx = gridY * columns + gridX;
+                    cells[idx] = state;
+                }
+            }
+        }
+    }
+}
+
+void Grid::start_locking_timer()
+{
+    if (!locking)
+    {
+        locking = true;
+        lockingDelayClock.restart();
+    }
+    
+}
+
+void Grid::cancel_locking_timer()
+{
+    locking = false;
+    std::cout << "Locking timer cancelled" << std::endl;
+}
+
+bool Grid::locking_tetro(const Tetro &tetro, int move_count)
+{
+    
+    if (locking && lockingDelayClock.getElapsedTime().asSeconds() >= 0.5f)
+    {
+        update_with_tetro(tetro, tetro.colorRef);
+        locking = false;
+        return true;
+    }
+    else if (move_count <= 0)
+    {
+        std::cout << "Locking piece due to no movement" << std::endl;
+        update_with_tetro(tetro, tetro.colorRef);
+        locking = false;
+        return true;
+    }
+    return false;
+}
+
+int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int futureY)
+{
+    // fonction de gestion des collisions pour les 4 cas suivantts:
+    // 0: pas de collision
+    // 1: collision mur gauche/droite ou piece verouillée
+    // 2: collision sol ou piece verouillée en descendant
+    // 3: collision plafond 
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (shape[i][j] == 1)
+            {
+                int cibleX = futureX + j;
+                int cibleY = futureY + i;
+
+                // Check des collisions
+                
+
+                if (cibleX < 0 || cibleX >= columns)
+                {
+                    return 1; // Collisions avec les murs
+                }
+
+                if (cibleY >= rows)
+                {
+                    start_locking_timer();
+                    return 2; // Collision avec le sol
+                }
+                
+                int indx_bottom = (tetro.position.y +1 + i) * columns + cibleX;
+                if (cells[indx_bottom] != 0 && cells[indx_bottom] != 1)
+                {
+                    if (tetro.position.y - 1 < 1)
+                        return 3;      // Collision avec le plafond
+                    start_locking_timer();
+                        return 2; // Collision avec le sol
+                    
+                }
+
+                int indx = cibleY * columns + cibleX;
+                if (cells[indx] != 0 && cells[indx] != 1)
+                {
+                    return 1; // Collision avec une pièce lockée sur les côtés
+                }
+
+                
+            }   
+        }
+    }
+    return 0; // No collision
+}
+
+
+
+void Grid::update_with_ghost_tetro(const Tetro &tetro, int state)
+{
+    for (int i = 0; i < rows * columns; i++)
+    {
+        if (cells[i] == 1)
+            cells[i] = 0;
+    }
+
+    const auto &shape = tetro.getShape(0);
+    Tetro ghostTetro = tetro;
+    // Move the ghost tetro down until collision
+    while (true)
+    {
+        int collision = check_collision(ghostTetro, shape, ghostTetro.position.x, ghostTetro.position.y + 1);
+        if (collision == 0)
+        {
+            ghostTetro.moveDown(1);
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (shape[i][j] == 1)
+            {
+                int gridX = ghostTetro.position.x + j;
+                int gridY = ghostTetro.position.y + i;
 
                 if (gridX >= 0 && gridX < columns && gridY >= 0 && gridY < rows)
                 {

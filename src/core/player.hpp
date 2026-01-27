@@ -29,7 +29,7 @@ public:
     ~Player(){}
 
     void generateTetro(Tetro &tempTetro);
-    void lockTetroInGrid(const Tetro &tetro);
+    int hasMadeMove(sf::Event &event);
 
 };
 

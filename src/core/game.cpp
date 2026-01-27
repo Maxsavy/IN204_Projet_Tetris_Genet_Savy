@@ -33,6 +33,7 @@ namespace game
         bool loopInvarient = true;
         sf::Time paceTime = sf::seconds(0.5f);
         int score = 0;
+        int move_count = 15;
 
         float scaleX = static_cast<float>(_window.getSize().x);
         float scaleY = static_cast<float>(_window.getSize().y);
@@ -56,20 +57,20 @@ namespace game
                     {
                         colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x, player.currentTetro.position.y + 1);
                         if (colision == 0)
-                            player.currentTetro.position.y++;
+                            player.currentTetro.moveDown(1);
                     }
 
                     if (event.key.code == sf::Keyboard::Q)
                     {
                         colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x - 1, player.currentTetro.position.y);
-                        if (colision == 0)
+                        if (colision == 0 || colision == 2)
                             player.currentTetro.moveLeft();
                     }
 
                     if (event.key.code == sf::Keyboard::D)
                     {
                         colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x + 1, player.currentTetro.position.y);
-                        if (colision == 0)
+                        if (colision == 0 || colision == 2)
                             player.currentTetro.moveRight();
                     }
 
@@ -86,6 +87,16 @@ namespace game
                     menu.start();
                     exit(0);
                 }
+
+                // Check for player movement to reset locking timer
+                if (player.hasMadeMove(event) != 0)
+                    {
+                        player.playerGrid.cancel_locking_timer();
+                        if (colision == 2)
+                        {
+                            move_count--;
+                        }
+                    }
             } // event loop
 
             
@@ -99,11 +110,14 @@ namespace game
                     
                 else if (colision == 2)
                 {
-                    sf::sleep(sf::milliseconds(500));
-                    player.lockTetroInGrid(player.currentTetro);
-                    player.currentTetro = player.nextTetro;
-                    player.generateTetro(player.nextTetro);
-                    player.currentTetro.moveDown(2);
+                    if (player.playerGrid.locking_tetro(player.currentTetro, move_count))
+                    {
+                        player.currentTetro = player.nextTetro;
+                        player.generateTetro(player.nextTetro);
+                        player.currentTetro.moveDown(2);
+                        move_count = 15;
+                    }
+
                 }
                 else if (colision == 3)
                 {
@@ -113,9 +127,10 @@ namespace game
             if (gameClock.getElapsedTime().asSeconds() >= 0.3f)
             {
                 player.playerGrid.delete_full_rows(score);
-                std::cout << "Score: " << score << std::endl;
+                
             }
-            paceTime = sf::seconds(0.5f - (static_cast<float>(score) * 0.08f));
+            player.hasMadeMove(event);
+            // paceTime = sf::seconds(0.5f - (static_cast<float>(score) * 0.08f));
             _window.display();
             _window.setFramerateLimit(60);
         }
