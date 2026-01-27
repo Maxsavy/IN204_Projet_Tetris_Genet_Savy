@@ -92,7 +92,7 @@ namespace game
                             player.currentTetro.rotate();
                             player.currentTetro.position.x += kick.first;
                             player.currentTetro.position.y += kick.second;
-                            std::cout << "Rotation avec kick: (" << kick.first << ", " << kick.second << ")" << std::endl;
+        
                         }
                     }
                 }
@@ -110,6 +110,7 @@ namespace game
                         if (colision == 2)
                         {
                             move_count--;
+                            std::cout << "Move count decreased to: " << move_count << std::endl;
                         }
                     }
             } // event loop
