@@ -47,7 +47,7 @@ void Player::lockTetroInGrid(const Tetro &tetro)
     generateTetro(currentTetro);
 }
 
-void Player::drawScore(sf::RenderWindow &window, sf::Font &font)
+void Player::drawDetails(sf::RenderWindow &window, sf::Font &font)
 {
     float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
     float mainGridW = static_cast<float>(COLUMNS) * pixelSize;
@@ -56,6 +56,7 @@ void Player::drawScore(sf::RenderWindow &window, sf::Font &font)
     float mainOriginY = (static_cast<float>(window.getSize().y) - mainGridH) / 2.f;
     float offsetX = mainOriginX + mainGridW + 30.f;
     float offsetY = mainOriginY + 200.f;
+
     sf::Text scoreText;
     scoreText.setFont(font);
     scoreText.setString("Score  " + std::to_string(score));
@@ -63,6 +64,22 @@ void Player::drawScore(sf::RenderWindow &window, sf::Font &font)
     scoreText.setFillColor(sf::Color::White);
     scoreText.setPosition(offsetX, offsetY);
     window.draw(scoreText);
+
+    sf::Text levelText;
+    levelText.setFont(font);
+    levelText.setString("Level  " + std::to_string(level));
+    levelText.setCharacterSize(40);
+    levelText.setFillColor(sf::Color::White);
+    levelText.setPosition(offsetX, offsetY + 70.f);
+    window.draw(levelText);
+
+    sf::Text linesText;
+    linesText.setFont(font);
+    linesText.setString("Lines Cleared " + std::to_string(playerLinesCleared));
+    linesText.setCharacterSize(35);
+    linesText.setFillColor(sf::Color::White);
+    linesText.setPosition(offsetX, offsetY + 140.f);
+    window.draw(linesText);
 }
 
 void Player::updateScore(int linesCleared)

@@ -18,6 +18,8 @@ public:
     std::vector<TetroType> tetroList;
     Grid playerGrid;
     Grid nextTetroGrid;
+    int level = 1;
+    int playerLinesCleared = 0;
 
     // Constructeurs et méthodes
 
@@ -30,7 +32,7 @@ public:
     void generateTetro(Tetro &tempTetro);
     void lockTetroInGrid(const Tetro &tetro);
     void updateScore(int linesCleared);
-    void drawScore(sf::RenderWindow &window, sf::Font &font);
+    void drawDetails(sf::RenderWindow &window, sf::Font &font);
 };
 
 #endif

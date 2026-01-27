@@ -130,7 +130,7 @@ namespace game
 
         player.playerGrid.drawGameGrid(_window, player.currentTetro, player.playerGrid.rows, player.playerGrid.columns);
         player.playerGrid.drawNextGrid(_window, player.nextTetro);
-        player.drawScore(_window, font);
+        player.drawDetails(_window, font);
     }
 
     void GameController::gameOver()
