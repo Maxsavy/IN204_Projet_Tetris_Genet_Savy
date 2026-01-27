@@ -104,6 +104,8 @@ namespace game
             if (gameClock.getElapsedTime().asSeconds() >= 0.3f)
             {
                 player.playerGrid.delete_full_rows();
+                player.updateScore(player.playerGrid.linesCleared);
+                player.playerGrid.linesCleared = 0;
             }
 
             _window.display();
@@ -130,6 +132,7 @@ namespace game
 
         player.playerGrid.drawGameGrid(_window, player.currentTetro, player.playerGrid.rows, player.playerGrid.columns);
         player.playerGrid.drawNextGrid(_window, player.nextTetro);
+        player.drawScore(_window, font);
     }
 
     void GameController::gameOver()

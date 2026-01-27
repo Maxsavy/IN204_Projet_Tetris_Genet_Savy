@@ -29,6 +29,8 @@ public:
 
     void generateTetro(Tetro &tempTetro);
     void lockTetroInGrid(const Tetro &tetro);
+    void updateScore(int linesCleared);
+    void drawScore(sf::RenderWindow &window, sf::Font &font);
 };
 
 #endif

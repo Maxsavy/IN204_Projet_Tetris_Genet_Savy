@@ -18,6 +18,7 @@ public:
     int rows;
     int columns;
     int cellSize;
+    int linesCleared;
     std::vector<int> cells;
 
     Grid() : rows(22), columns(10), cellSize(8)

@@ -107,6 +107,7 @@ void Grid::delete_full_rows()
 
         if (isFull)
         {
+            linesCleared++;
             // Move all rows above down by one
             for (int k = i; k > 0; k--)
             {

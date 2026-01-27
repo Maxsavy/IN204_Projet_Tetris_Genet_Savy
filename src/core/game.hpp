@@ -66,6 +66,7 @@ namespace game
         sf::RenderWindow &_window;
         sf::Vector2i direction;
         sf::Font font;
+        sf::Text scoreText;
         float scale;
         int score;
 
