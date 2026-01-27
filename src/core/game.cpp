@@ -30,7 +30,7 @@ namespace game
         bool loopInvarient = true;
         float scaleX = static_cast<float>(_window.getSize().x);
         float scaleY = static_cast<float>(_window.getSize().y);
-        while (loopInvarient)
+        while (loopInvarient && _window.isOpen())
         {
             setupScene();
             int colision;
@@ -41,9 +41,8 @@ namespace game
                 {
                     if (event.key.code == sf::Keyboard::Escape)
                     {
-                        game::MainMenu menu(_window);
-                        menu.start();
-                        exit(0);
+                        loopInvarient = false;
+                        break;
                     }
 
                     if (event.key.code == sf::Keyboard::S)
@@ -76,9 +75,8 @@ namespace game
                 }
                 if (event.type == sf::Event::Closed)
                 {
-                    game::MainMenu menu(_window);
-                    menu.start();
-                    exit(0);
+                    loopInvarient = false;
+                    break;
                 }
             } // event loop
 

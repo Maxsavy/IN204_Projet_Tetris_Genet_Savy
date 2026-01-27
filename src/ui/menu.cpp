@@ -135,7 +135,9 @@ namespace game
                  cout << "settings!" << endl;
              }},
             {"Exit", [&](sf::RenderTarget &target)
-             { this->_is_exit_requested = true; }}};
+             { this->_is_exit_requested = true; 
+               _window.close(); }},
+        };
 
         game_menu::MenuConfig config{
             .title = " Tetris ouiii", .items = items, .style = style};
