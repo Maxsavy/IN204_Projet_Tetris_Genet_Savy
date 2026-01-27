@@ -12,7 +12,7 @@ public:
 
     std::string name;
     unsigned int id;
-    int score;
+    int score = 0;
     Tetro currentTetro;
     Tetro nextTetro;
     std::vector<TetroType> tetroList;
