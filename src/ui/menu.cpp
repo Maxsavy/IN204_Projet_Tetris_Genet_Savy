@@ -9,7 +9,7 @@ namespace game
     sf::Sprite background_sprite;
 
     MainMenu::MainMenu(sf::RenderWindow &w)
-        : _window(w), _main_menu_context(nullptr, menu_destroy_context), _game_over_menu_context(nullptr, menu_destroy_context)
+        : _window(w), _main_menu_context(nullptr, menu_destroy_context), _game_over_menu_context(nullptr, menu_destroy_context), _pause_menu_context(nullptr, menu_destroy_context)
     {
         setup_menu_context();
     }
@@ -145,7 +145,6 @@ namespace game
         _current_menu = _main_menu_context.get();
 
         setup_game_over_menu();
-        setup_pause_menu();
     }
 
     void MainMenu::setup_game_over_menu()
@@ -190,8 +189,11 @@ namespace game
         _game_over_menu_context.reset(create_menu_context(_window, config));
     }
 
-    void MainMenu::setup_pause_menu()
+    void MainMenu::showPauseMenu(GameController *gameController)
     {
+        _return_to_main_menu = false;
+        _resume_game = false;
+
         game_menu::Style style{.TitleFont = &_font,
                                .ItemFont = &_font,
                                .TitleFontSize = 50,
@@ -217,36 +219,34 @@ namespace game
             {"Resume",
              [&](sf::RenderTarget &target)
              {
-                 game::GameController gameController(_window);
-                 gameController.resume();
+                 _resume_game = true;
              }},
             {"Return  to  Menu", [&](sf::RenderTarget &target)
              {
                  _return_to_main_menu = true;
                  _current_menu = _main_menu_context.get();
-                 start();
              }}};
 
         game_menu::MenuConfig config{
             .title = " PAUSE", .items = items, .style = style};
-        _pause_menu_context.reset(create_menu_context(_window, config));
-    }
 
-    void MainMenu::showPauseMenu()
-    {
-        _return_to_main_menu = false;
+        _pause_menu_context.reset(create_menu_context(_window, config));
         _current_menu = _pause_menu_context.get();
+
         _window.setFramerateLimit(144);
-        while (_window.isOpen() && !_return_to_main_menu)
+        while (_window.isOpen() && !_return_to_main_menu && !_resume_game)
         {
             sf::Event event;
             while (_window.pollEvent(event))
             {
-                if (event.type == sf::Event::Closed ||
-                    (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+                if (event.type == sf::Event::Closed)
                 {
-                    game::GameController gameController(_window);
-                    gameController.resume();
+                    _window.close();
+                    return;
+                }
+                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+                {
+                    _resume_game = true;
                     break;
                 }
                 menu_handle_event(_current_menu, event);
@@ -259,6 +259,11 @@ namespace game
             menu_render(_current_menu);
             _window.display();
         }
-        _current_menu = _main_menu_context.get();
+
+        if (_return_to_main_menu)
+        {
+            _current_menu = _main_menu_context.get();
+            start();
+        }
     }
 }

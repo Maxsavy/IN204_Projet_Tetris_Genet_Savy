@@ -45,11 +45,10 @@ namespace game
         GameController(sf::RenderWindow &w);
         Player player;
         sf::Clock gameClock;
-
+        void gameLoop();
         void start();
 
     private:
-        void gameLoop();
         void setupScene();
         void gameOver();
         void pause();
