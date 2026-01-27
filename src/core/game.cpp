@@ -27,6 +27,7 @@ namespace game
     void GameController::gameLoop()
     {
         bool loopInvarient = true;
+        sf::Time paceTime = sf::seconds(0.5f);
         float scaleX = static_cast<float>(_window.getSize().x);
         float scaleY = static_cast<float>(_window.getSize().y);
         while (loopInvarient && _window.isOpen())
@@ -78,7 +79,7 @@ namespace game
                 }
             } // event loop
 
-            if (gameClock.getElapsedTime().asSeconds() >= 0.5f)
+            if (gameClock.getElapsedTime().asSeconds() >= paceTime.asSeconds())
             {
                 gameClock.restart();
                 colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x, player.currentTetro.position.y + 1);
