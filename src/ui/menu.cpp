@@ -221,6 +221,13 @@ namespace game
              {
                  _resume_game = true;
              }},
+            {"Replay",
+             [&](sf::RenderTarget &target)
+             {
+                 _resume_game = false;
+                 GameController gameController(_window);
+                 gameController.start();
+             }},
             {"Return  to  Menu", [&](sf::RenderTarget &target)
              {
                  _return_to_main_menu = true;
