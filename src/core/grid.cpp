@@ -107,6 +107,7 @@ void Grid::delete_full_rows()
 
         if (isFull)
         {
+            linesCleared++;
             // Move all rows above down by one
             for (int k = i; k > 0; k--)
             {
@@ -133,7 +134,7 @@ void Grid::drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro)
     float mainOriginX = (static_cast<float>(window.getSize().x) - mainGridW) / 2.f;
     float mainOriginY = (static_cast<float>(window.getSize().y) - mainGridH) / 2.f;
     float nextGridOffsetX = mainOriginX + mainGridW + 30.f;
-    float nextGridOffsetY = mainOriginY + mainGridH / 2.f - (4 * pixelSize) / 2.f;
+    float nextGridOffsetY = mainOriginY;
 
     nextTetro.setPosition(1, -1);
     this->update_with_tetro(nextTetro, 1);

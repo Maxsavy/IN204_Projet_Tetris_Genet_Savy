@@ -3,7 +3,6 @@
 #include "../ui/menu.hpp"
 namespace game
 {
-    // constructor
     GameController::GameController(sf::RenderWindow &w)
         : _window(w)
     {
@@ -30,7 +29,7 @@ namespace game
         bool loopInvarient = true;
         float scaleX = static_cast<float>(_window.getSize().x);
         float scaleY = static_cast<float>(_window.getSize().y);
-        while (loopInvarient)
+        while (loopInvarient && _window.isOpen())
         {
             setupScene();
             int colision;
@@ -41,9 +40,7 @@ namespace game
                 {
                     if (event.key.code == sf::Keyboard::Escape)
                     {
-                        game::MainMenu menu(_window);
-                        menu.start();
-                        exit(0);
+                        pause();
                     }
 
                     if (event.key.code == sf::Keyboard::S)
@@ -76,9 +73,8 @@ namespace game
                 }
                 if (event.type == sf::Event::Closed)
                 {
-                    game::MainMenu menu(_window);
-                    menu.start();
-                    exit(0);
+                    loopInvarient = false;
+                    break;
                 }
             } // event loop
 
@@ -106,6 +102,8 @@ namespace game
             if (gameClock.getElapsedTime().asSeconds() >= 0.3f)
             {
                 player.playerGrid.delete_full_rows();
+                player.updateScore(player.playerGrid.linesCleared);
+                player.playerGrid.linesCleared = 0;
             }
 
             _window.display();
@@ -132,13 +130,19 @@ namespace game
 
         player.playerGrid.drawGameGrid(_window, player.currentTetro, player.playerGrid.rows, player.playerGrid.columns);
         player.playerGrid.drawNextGrid(_window, player.nextTetro);
+        player.drawScore(_window, font);
     }
 
     void GameController::gameOver()
     {
         game::MainMenu menu(_window);
-        menu.start();
-        exit(0);
+        menu.showGameOverMenu();
+    }
+
+    void GameController::pause()
+    {
+        game::MainMenu menu(_window);
+        menu.showPauseMenu(this);
     }
 
     sf::RectangleShape getRectangleAt(sf::Vector2f location, sf::Color color)

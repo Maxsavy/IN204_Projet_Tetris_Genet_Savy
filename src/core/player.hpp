@@ -12,7 +12,7 @@ public:
 
     std::string name;
     unsigned int id;
-    int score;
+    int score = 0;
     Tetro currentTetro;
     Tetro nextTetro;
     std::vector<TetroType> tetroList;
@@ -29,6 +29,8 @@ public:
 
     void generateTetro(Tetro &tempTetro);
     void lockTetroInGrid(const Tetro &tetro);
+    void updateScore(int linesCleared);
+    void drawScore(sf::RenderWindow &window, sf::Font &font);
 };
 
 #endif

@@ -45,13 +45,13 @@ namespace game
         GameController(sf::RenderWindow &w);
         Player player;
         sf::Clock gameClock;
-
+        void gameLoop();
         void start();
 
     private:
-        void gameLoop();
         void setupScene();
         void gameOver();
+        void pause();
         void loadResources();
         void loadTexture(sf::Texture &texture, const std::string &file, sf::Sprite &sprite);
         void setUpBackground(sf::Texture &texture, sf::Sprite &sprite);
@@ -66,8 +66,10 @@ namespace game
         sf::RenderWindow &_window;
         sf::Vector2i direction;
         sf::Font font;
+        sf::Text scoreText;
         float scale;
         int score;
+        bool isPaused = false;
 
     }; // class game
 
