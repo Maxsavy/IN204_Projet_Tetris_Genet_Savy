@@ -109,6 +109,7 @@ namespace game
 
             _window.display();
             _window.setFramerateLimit(60);
+            paceTime = sf::seconds(0.5f - (static_cast<float>(player.playerGrid.totalLinesCleared / 10) * 0.08f));
         }
     } // gameLoop()
 
