@@ -76,9 +76,24 @@ namespace game
 
                     if (event.key.code == sf::Keyboard::Z)
                     {
-                        colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(1), player.currentTetro.position.x, player.currentTetro.position.y);
-                        if (colision == 0)  
+                        // Obtenir la forme après rotation
+                        auto newShape = player.currentTetro.getShape(1);
+                        int currentRotation = player.currentTetro.currentRotation; // Ajoutez ce membre si nécessaire
+
+                        // Tester la rotation avec wall kicks
+                        auto kick = player.playerGrid.try_wall_kicks(player.currentTetro, newShape, currentRotation);
+
+                        // Vérifier si un kick a réussi
+                        colision = player.playerGrid.check_collision(
+                            player.currentTetro, newShape, player.currentTetro.position.x + kick.first, player.currentTetro.position.y + kick.second);
+
+                        if (colision == 0 || colision == 1) // Pas de collision critique
+                        {
                             player.currentTetro.rotate();
+                            player.currentTetro.position.x += kick.first;
+                            player.currentTetro.position.y += kick.second;
+                            std::cout << "Rotation avec kick: (" << kick.first << ", " << kick.second << ")" << std::endl;
+                        }
                     }
                 }
                 if (event.type == sf::Event::Closed)

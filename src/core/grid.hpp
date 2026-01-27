@@ -42,6 +42,7 @@ public:
     void cancel_locking_timer();
     bool locking_tetro(const Tetro &tetro, int move_count);
     int check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int FutureY);
+    std::pair<int, int> try_wall_kicks(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &newShape, int currentRotation);
     void update_with_ghost_tetro(const Tetro &tetro, int state);
     void delete_full_rows(int &nbDestroyedLines);
     void drawGrid(sf::RenderWindow &window, const Tetro &currentTetro);

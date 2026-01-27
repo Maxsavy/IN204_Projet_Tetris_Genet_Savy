@@ -58,7 +58,6 @@ void Grid::start_locking_timer()
 void Grid::cancel_locking_timer()
 {
     locking = false;
-    std::cout << "Locking timer cancelled" << std::endl;
 }
 
 bool Grid::locking_tetro(const Tetro &tetro, int move_count)
@@ -72,7 +71,6 @@ bool Grid::locking_tetro(const Tetro &tetro, int move_count)
     }
     else if (move_count <= 0)
     {
-        std::cout << "Locking piece due to no movement" << std::endl;
         update_with_tetro(tetro, tetro.colorRef);
         locking = false;
         return true;
@@ -80,6 +78,59 @@ bool Grid::locking_tetro(const Tetro &tetro, int move_count)
     return false;
 }
 
+int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int futureY)
+{
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (shape[i][j] == 1)
+            {
+                int cibleX = futureX + j;
+                int cibleY = futureY + i;
+
+                // Check horizontal bounds
+                if (cibleX < 0 || cibleX >= columns)
+                {
+                    return 1; // Collision avec les murs
+                }
+
+                // Check vertical bounds
+                if (cibleY >= rows)
+                {
+                    start_locking_timer();
+                    return 2; // Collision avec le sol
+                }
+                
+                // Check collision avec pièce en dessous
+                if (cibleY + 1 < rows)
+                {
+                    int indx_bottom = (cibleY + 1) * columns + cibleX;
+                    if (cells[indx_bottom] != 0 && cells[indx_bottom] != 1)
+                    {
+                        if (cibleY < 1)
+                            return 3; // Collision avec le plafond
+                        start_locking_timer();
+                        return 2; // Collision avec une pièce en dessous
+                    }
+                }
+
+                // Check collision latérale avec pièce lockée
+                int indx = cibleY * columns + cibleX;
+                if (indx >= 0 && indx < rows * columns)
+                {
+                    if (cells[indx] != 0 && cells[indx] != 1)
+                    {
+                        return 1; // Collision avec une pièce lockée sur les côtés
+                    }
+                }
+            }   
+        }
+    }
+    return 0; // Pas de collision
+}
+
+/*
 int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int futureY)
 {
     // fonction de gestion des collisions pour les 4 cas suivantts:
@@ -133,7 +184,60 @@ int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4
     }
     return 0; // No collision
 }
+*/
 
+
+std::pair<int, int> Grid::try_wall_kicks(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &newShape, int currentRotation)
+{
+    // Positions de test standard pour le wall kick (SRS - Super Rotation System)
+    // Format: {offsetX, offsetY}
+    std::vector<std::pair<int, int>> kickTests;
+    
+    // Pour les pièces I, utilisez un système différent
+    bool isIPiece = (tetro.colorRef == 2); // Supposant que I = colorRef 2
+    
+    if (isIPiece)
+    {
+        // Wall kicks spéciaux pour la pièce I
+        if (currentRotation == 0 || currentRotation == 2)
+        {
+            kickTests = {{0, 0}, {-2, 0}, {1, 0}, {-2, -1}, {1, 2}};
+        }
+        else
+        {
+            kickTests = {{0, 0}, {-1, 0}, {2, 0}, {-1, 2}, {2, -1}};
+        }
+    }
+    else
+    {
+        // Wall kicks standard pour J, L, S, T, Z
+        kickTests = {
+            {0, 0},   // Pas de décalage (test normal)
+            {-1, 0},  // Décalage gauche
+            {1, 0},   // Décalage droite
+            {0, -1},  // Décalage haut
+            {-1, -1}, // Diagonale haut-gauche
+            {1, -1}   // Diagonale haut-droite
+        };
+    }
+    
+    // Tester chaque position
+    for (const auto& kick : kickTests)
+    {
+        int testX = tetro.position.x + kick.first;
+        int testY = tetro.position.y + kick.second;
+        
+        int collision = check_collision(tetro, newShape, testX, testY);
+        
+        // Si pas de collision avec mur/pièce lockée (0 ou 2 acceptable si pas au sol)
+        if (collision == 0)
+        {
+            return kick; // Retourne le décalage qui fonctionne
+        }
+    }
+    
+    return {0, 0}; // Aucun kick n'a fonctionné
+}
 
 
 void Grid::update_with_ghost_tetro(const Tetro &tetro, int state)
