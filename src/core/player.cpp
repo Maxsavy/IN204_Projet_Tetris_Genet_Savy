@@ -75,10 +75,10 @@ void Player::drawDetails(sf::RenderWindow &window, sf::Font &font)
 
     sf::Text linesText;
     linesText.setFont(font);
-    linesText.setString("Lines Cleared " + std::to_string(playerLinesCleared));
+    linesText.setString("Lines Cleared " + std::to_string(playerGrid.totalLinesCleared));
     linesText.setCharacterSize(35);
     linesText.setFillColor(sf::Color::White);
-    linesText.setPosition(offsetX, offsetY + 140.f);
+    linesText.setPosition(offsetX, offsetY + 130.f);
     window.draw(linesText);
 }
 

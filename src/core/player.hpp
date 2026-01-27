@@ -19,8 +19,6 @@ public:
     Grid playerGrid;
     Grid nextTetroGrid;
     int level = 1;
-    int playerLinesCleared = 0;
-
     // Constructeurs et méthodes
 
     Player() : score(0), name("Player"), id(0)
