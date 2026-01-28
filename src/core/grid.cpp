@@ -208,7 +208,7 @@ void Grid::update_with_ghost_tetro(const Tetro &tetro, int state)
     }
 }
 
-void Grid::delete_full_rows(int &nbDestroyedLines)
+void Grid::delete_full_rows()
 {
     for (int i = 0; i < rows; i++)
     {
@@ -339,7 +339,7 @@ void Grid::drawGhostTetro(sf::RenderWindow &window, const Tetro &currentTetro)
     float targetW = static_cast<float>(cols) * pixelSize;
     float targetH = static_cast<float>(rows) * pixelSize;
     float originX = (static_cast<float>(window.getSize().x) - targetW) / 2.f;
-    float originY = (static_cast<float>(window.getSize().y) - targetH) / 2.f;
+    float originY = (static_cast<float>(window.getSize().y) - targetH) / 2.f + pixelSize;
 
     sf::RectangleShape cellShape(sf::Vector2f(pixelSize, pixelSize));
     cellShape.setOutlineThickness(2.f);
