@@ -254,12 +254,14 @@ namespace game
         int finalScore = player[0].score;
         int finalLevel = player[0].level;
         game::MainMenu menu(_window);
+        menu.last_selected_mode = this->modePLayed;
         menu.showGameOverMenu(finalScore, finalLevel);
     }
 
     void GameController::pause()
     {
         game::MainMenu menu(_window);
+        menu.last_selected_mode = this->modePLayed;
         menu.showPauseMenu(this);
     }
 

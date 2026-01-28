@@ -231,16 +231,18 @@ namespace game
             {"New  Solo  Game",
              [&](sf::RenderTarget &target)
              {
+                last_selected_mode = 1;
                  game::GameController gameController(_window);
-                 last_selected_mode = 1;
-                 gameController.start(1);
+                 std::cout << "Starting solo game with mode " << last_selected_mode << std::endl;
+                 gameController.start(last_selected_mode);
              }},
             {"New  Split Screen Game",
              [&](sf::RenderTarget &target)
              {
+                last_selected_mode = 2;
                  game::GameController gameController(_window);
-                 last_selected_mode = 2;
-                 gameController.start(2);
+                 std::cout << "Starting split screen game with mode " << last_selected_mode << std::endl;
+                 gameController.start(last_selected_mode);
              }},
             {"Leaderboard", [](sf::RenderTarget &target)
              {
@@ -262,6 +264,56 @@ namespace game
         _current_menu = _main_menu_context.get();
 
         setup_game_over_menu();
+        setup_pause_menu();
+    }
+
+    void MainMenu::setup_pause_menu()
+    {
+        game_menu::Style style{.TitleFont = &_font,
+                            .ItemFont = &_font,
+                            .TitleFontSize = 60,
+                            .ItemFontSize = 35,
+                            .MenuTitleScaleFactor = 1,
+                            .MenuItemScaleFactor = 1.5,
+                            .colorScheme = {.titleColor = 0xFFFFFF,
+                                            .itemColor = 0xFFFFFF,
+                                            .selectedColor = 0xFF22F1},
+                            .PaddingTitle =
+                                {
+                                    .top = 100,
+                                    .left = 0,
+                                },
+                            .PaddingItems =
+                                {
+                                    .top = 30,
+                                },
+                            .TitleAlign = game_menu::Align::Center,
+                            .ItemAlign = game_menu::Align::Center};
+
+        std::vector<game_menu::MenuItem> items{
+            {"Resume",
+            [&](sf::RenderTarget &target)
+            {
+                _resume_game = true;
+            }},
+            {"Replay",
+            [&](sf::RenderTarget &target)
+            {
+                _resume_game = false;
+                std::cout << "DEBUG: Replaying with mode " << last_selected_mode << std::endl;
+                GameController gameController(_window);
+                gameController.start(last_selected_mode);
+            }},
+            {"Return  to  Menu", [&](sf::RenderTarget &target)
+            {
+                _return_to_main_menu = true;
+                _current_menu = _main_menu_context.get();
+            }}};
+
+        game_menu::MenuConfig config{
+            .title = " PAUSE", .items = items, .style = style};
+
+        _pause_menu_context.reset(create_menu_context(_window, config));
     }
 
     void MainMenu::setup_game_over_menu()
@@ -291,8 +343,8 @@ namespace game
             {"Replay",
              [&](sf::RenderTarget &target)
              {
-                 game::GameController gameController(_window);
-                 gameController.start(last_selected_mode);
+                game::GameController gameController(_window);
+                gameController.start(last_selected_mode);
              }},
             {"Return  to  Menu", [&](sf::RenderTarget &target)
              {
@@ -311,50 +363,6 @@ namespace game
         _return_to_main_menu = false;
         _resume_game = false;
 
-        game_menu::Style style{.TitleFont = &_font,
-                               .ItemFont = &_font,
-                               .TitleFontSize = 60,
-                               .ItemFontSize = 35,
-                               .MenuTitleScaleFactor = 1,
-                               .MenuItemScaleFactor = 1.5,
-                               .colorScheme = {.titleColor = 0xFFFFFF,
-                                               .itemColor = 0xFFFFFF,
-                                               .selectedColor = 0xFF22F1},
-                               .PaddingTitle =
-                                   {
-                                       .top = 100,
-                                       .left = 0,
-                                   },
-                               .PaddingItems =
-                                   {
-                                       .top = 30,
-                                   },
-                               .TitleAlign = game_menu::Align::Center,
-                               .ItemAlign = game_menu::Align::Center};
-
-        std::vector<game_menu::MenuItem> items{
-            {"Resume",
-             [&](sf::RenderTarget &target)
-             {
-                 _resume_game = true;
-             }},
-            {"Replay",
-             [&](sf::RenderTarget &target)
-             {
-                 _resume_game = false;
-                 GameController gameController(_window);
-                 gameController.start(last_selected_mode);
-             }},
-            {"Return  to  Menu", [&](sf::RenderTarget &target)
-             {
-                 _return_to_main_menu = true;
-                 _current_menu = _main_menu_context.get();
-             }}};
-
-        game_menu::MenuConfig config{
-            .title = " PAUSE", .items = items, .style = style};
-
-        _pause_menu_context.reset(create_menu_context(_window, config));
         _current_menu = _pause_menu_context.get();
 
         _window.setFramerateLimit(144);

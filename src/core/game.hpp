@@ -46,6 +46,7 @@ namespace game
         GameController(sf::RenderWindow &w);
         Player player[2];
         sf::Clock gameClock;
+        int modePLayed;
         void gameLoop();
         void start(int mode);
 
@@ -71,11 +72,10 @@ namespace game
         sf::Text scoreText;
         float scale;
         int score;
-        int modePLayed;
         bool isPaused = false;
 
     }; // class game
 
-} // namespace game
+}; // namespace game
 
 #endif // GAME_HPP
