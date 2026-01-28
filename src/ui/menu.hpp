@@ -13,7 +13,7 @@ namespace game
     public:
         MainMenu(sf::RenderWindow &w);
         void start();
-        void showGameOverMenu();
+        void showGameOverMenu(int finalScore = 0, int finalLevel = 1);
         void showPauseMenu(GameController *gameController);
 
     private:

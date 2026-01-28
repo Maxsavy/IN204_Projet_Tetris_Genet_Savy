@@ -141,13 +141,11 @@ namespace game
         Player &p = player[playerId];
         int collision;
 
-        // Define controls based on player
         sf::Keyboard::Key downKey = (playerId == 0) ? sf::Keyboard::S : sf::Keyboard::Down;
         sf::Keyboard::Key leftKey = (playerId == 0) ? sf::Keyboard::Q : sf::Keyboard::Left;
         sf::Keyboard::Key rightKey = (playerId == 0) ? sf::Keyboard::D : sf::Keyboard::Right;
         sf::Keyboard::Key rotateKey = (playerId == 0) ? sf::Keyboard::Z : sf::Keyboard::Up;
 
-        // Move down
         if (event.key.code == downKey)
         {
             collision = p.playerGrid.check_collision(
@@ -164,7 +162,6 @@ namespace game
             }
         }
 
-        // Move left
         if (event.key.code == leftKey)
         {
             collision = p.playerGrid.check_collision(
@@ -181,7 +178,6 @@ namespace game
             }
         }
 
-        // Move right
         if (event.key.code == rightKey)
         {
             collision = p.playerGrid.check_collision(
@@ -198,7 +194,6 @@ namespace game
             }
         }
 
-        // Rotate
         if (event.key.code == rotateKey)
         {
             auto newShape = p.currentTetro.getShape(1);
@@ -256,8 +251,10 @@ namespace game
 
     void GameController::gameOver()
     {
+        int finalScore = player[0].score;
+        int finalLevel = player[0].level;
         game::MainMenu menu(_window);
-        menu.showGameOverMenu();
+        menu.showGameOverMenu(finalScore, finalLevel);
     }
 
     void GameController::pause()

@@ -1,5 +1,6 @@
 #include "menu.hpp"
 #include "../core/game.hpp"
+#include "../core/leaderboard.hpp"
 #include <iostream>
 using namespace std;
 
@@ -46,32 +47,139 @@ namespace game
         }
     }
 
-    void MainMenu::showGameOverMenu()
+    void MainMenu::showGameOverMenu(int finalScore, int finalLevel)
     {
         _return_to_main_menu = false;
-        _current_menu = _game_over_menu_context.get();
         _window.setFramerateLimit(144);
-        while (_window.isOpen() && !_return_to_main_menu)
+
+        std::string playerName = "";
+        bool enteringName = true;
+        const int maxNameLength = 15;
+
+        sf::Font font;
+        if (!font.loadFromFile("assets/fonts/arcade.ttf"))
+        {
+            std::cerr << "Failed to load font" << std::endl;
+            return;
+        }
+
+        sf::Text titleText;
+        titleText.setFont(font);
+        titleText.setString("GAME OVER");
+        titleText.setCharacterSize(60);
+        titleText.setFillColor(sf::Color::White);
+        titleText.setPosition(_window.getSize().x / 2.0f - 180.0f, 100.0f);
+
+        sf::Text scoreText;
+        scoreText.setFont(font);
+        scoreText.setString("Score  " + std::to_string(finalScore));
+        scoreText.setCharacterSize(40);
+        scoreText.setFillColor(sf::Color::Cyan);
+        scoreText.setPosition(_window.getSize().x / 2.0f - 150.0f, 200.0f);
+
+        sf::Text levelText;
+        levelText.setFont(font);
+        levelText.setString("Level  " + std::to_string(finalLevel));
+        levelText.setCharacterSize(40);
+        levelText.setFillColor(sf::Color::Cyan);
+        levelText.setPosition(_window.getSize().x / 2.0f - 150.0f, 260.0f);
+
+        sf::Text promptText;
+        promptText.setFont(font);
+        promptText.setString("Enter your name");
+        promptText.setCharacterSize(35);
+        promptText.setFillColor(sf::Color::White);
+        promptText.setPosition(_window.getSize().x / 2.0f - 180.0f, 350.0f);
+
+        sf::Text nameText;
+        nameText.setFont(font);
+        nameText.setString("_");
+        nameText.setCharacterSize(45);
+        nameText.setFillColor(sf::Color::Yellow);
+        nameText.setPosition(_window.getSize().x / 2.0f - 100.0f, 420.0f);
+
+        sf::Text instructionText;
+        instructionText.setFont(font);
+        instructionText.setString("Press ENTER to continue");
+        instructionText.setCharacterSize(25);
+        instructionText.setFillColor(sf::Color(200, 200, 200));
+        instructionText.setPosition(_window.getSize().x / 2.0f - 200.0f, 520.0f);
+
+        sf::Clock blinkClock;
+        bool showCursor = true;
+
+        while (_window.isOpen() && enteringName)
         {
             sf::Event event;
             while (_window.pollEvent(event))
             {
-                if (event.type == sf::Event::Closed ||
-                    (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+                if (event.type == sf::Event::Closed)
                 {
-                    _return_to_main_menu = true;
-                    break;
+                    _window.close();
+                    return;
                 }
-                menu_handle_event(_current_menu, event);
+
+                if (event.type == sf::Event::TextEntered)
+                {
+                    if (event.text.unicode == '\b' && playerName.length() > 0)
+                    {
+                        playerName.pop_back();
+                    }
+                    else if (event.text.unicode == '\r' || event.text.unicode == '\n')
+                    {
+                        if (playerName.empty())
+                        {
+                            playerName = "Player";
+                        }
+                        enteringName = false;
+                    }
+                    else if (event.text.unicode < 128 && event.text.unicode >= 32 &&
+                             playerName.length() < maxNameLength)
+                    {
+                        playerName += static_cast<char>(event.text.unicode);
+                    }
+                }
             }
+
+            if (blinkClock.getElapsedTime().asSeconds() >= 0.5f)
+            {
+                showCursor = !showCursor;
+                blinkClock.restart();
+            }
+
+            std::string displayName = playerName;
+            if (showCursor && enteringName)
+            {
+                displayName += "_";
+            }
+            nameText.setString(displayName);
+
+            sf::FloatRect textBounds = nameText.getLocalBounds();
+            nameText.setPosition(_window.getSize().x / 2.0f - textBounds.width / 2.0f, 420.0f);
+
             _window.clear();
             if (background.getSize().x > 0 && background.getSize().y > 0)
             {
                 _window.draw(background_sprite);
             }
-            menu_render(_current_menu);
+            _window.draw(titleText);
+            _window.draw(scoreText);
+            _window.draw(levelText);
+            _window.draw(promptText);
+            _window.draw(nameText);
+            _window.draw(instructionText);
             _window.display();
         }
+
+        // Save to leaderboard
+        if (!playerName.empty())
+        {
+            Leaderboard leaderboard;
+            leaderboard.addEntry("src/core/leaderboard.txt", playerName, finalScore, finalLevel);
+        }
+
+        // Return to main menu
+        _return_to_main_menu = true;
         _current_menu = _main_menu_context.get();
     }
 
@@ -136,7 +244,8 @@ namespace game
              }},
             {"Leaderboard", [](sf::RenderTarget &target)
              {
-                 cout << "leaderboard!" << endl;
+                 Leaderboard leaderboard;
+                 leaderboard.start(static_cast<sf::RenderWindow &>(target));
              }},
             {"Settings", [](sf::RenderTarget &target)
              {
