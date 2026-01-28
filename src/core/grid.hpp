@@ -34,6 +34,7 @@ public:
     sf::Music lineClearSound;
     sf::Music lockSound;
 
+    // grid constructor
     Grid() : rows(22), columns(10), cellSize(8)
     {
         cells = std::vector<int>(rows * columns);

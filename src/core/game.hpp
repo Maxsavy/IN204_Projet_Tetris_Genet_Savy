@@ -60,7 +60,6 @@ namespace game
         void setUpBackground(sf::Texture &texture, sf::Sprite &sprite);
         void handlePlayerInput(int playerId, sf::Event &event, int &moveCount, bool &isTouchingGround);
 
-        //    Grid grid;
         sf::Texture background;
         sf::Texture grid;
         sf::Texture logo;
