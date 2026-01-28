@@ -29,128 +29,139 @@ namespace game
     }
 
     void GameController::gameLoop()
+{
+    bool loopInvarient = true;
+    sf::Time paceTime = sf::seconds(0.5f);
+    int score = 0;
+    int move_count = 15;
+    bool isTouchingGround = false; // Nouveau flag
+
+    float scaleX = static_cast<float>(_window.getSize().x);
+    float scaleY = static_cast<float>(_window.getSize().y);
+    while (loopInvarient)
     {
-        bool loopInvarient = true;
-        sf::Time paceTime = sf::seconds(0.5f);
-        int score = 0;
-        int move_count = 15;
-
-        float scaleX = static_cast<float>(_window.getSize().x);
-        float scaleY = static_cast<float>(_window.getSize().y);
-        while (loopInvarient)
+        setupScene();
+        int colision = 0;
+        sf::Event event;
+        while (_window.pollEvent(event))
         {
-            setupScene();
-            int colision;
-            sf::Event event;
-            while (_window.pollEvent(event))
+            if (event.type == sf::Event::KeyPressed)
             {
-                if (event.type == sf::Event::KeyPressed)
-                {
-                    if (event.key.code == sf::Keyboard::Escape)
-                    {
-                        game::MainMenu menu(_window);
-                        menu.start();
-                        exit(0);
-                    }
-
-                    if (event.key.code == sf::Keyboard::S)
-                    {
-                        colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x, player.currentTetro.position.y + 1);
-                        if (colision == 0)
-                            player.currentTetro.moveDown(1);
-                    }
-
-                    if (event.key.code == sf::Keyboard::Q)
-                    {
-                        colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x - 1, player.currentTetro.position.y);
-                        if (colision == 0 || colision == 2)
-                            player.currentTetro.moveLeft();
-                    }
-
-                    if (event.key.code == sf::Keyboard::D)
-                    {
-                        colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x + 1, player.currentTetro.position.y);
-                        if (colision == 0 || colision == 2)
-                            player.currentTetro.moveRight();
-                    }
-
-                    if (event.key.code == sf::Keyboard::Z)
-                    {
-                        // Obtenir la forme après rotation
-                        auto newShape = player.currentTetro.getShape(1);
-                        int currentRotation = player.currentTetro.currentRotation; // Ajoutez ce membre si nécessaire
-
-                        // Tester la rotation avec wall kicks
-                        auto kick = player.playerGrid.try_wall_kicks(player.currentTetro, newShape, currentRotation);
-
-                        // Vérifier si un kick a réussi
-                        colision = player.playerGrid.check_collision(
-                            player.currentTetro, newShape, player.currentTetro.position.x + kick.first, player.currentTetro.position.y + kick.second);
-
-                        if (colision == 0 || colision == 1) // Pas de collision critique
-                        {
-                            player.currentTetro.rotate();
-                            player.currentTetro.position.x += kick.first;
-                            player.currentTetro.position.y += kick.second;
-        
-                        }
-                    }
-                }
-                if (event.type == sf::Event::Closed)
+                if (event.key.code == sf::Keyboard::Escape)
                 {
                     game::MainMenu menu(_window);
                     menu.start();
                     exit(0);
                 }
 
-                // Check for player movement to reset locking timer
-                if (player.hasMadeMove(event) != 0)
+                if (event.key.code == sf::Keyboard::S)
+                {
+                    colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x, player.currentTetro.position.y + 1);
+                    if (colision == 0)
                     {
-                        player.playerGrid.cancel_locking_timer();
-                        if (colision == 2)
+                        player.currentTetro.moveDown(1);
+                        if (isTouchingGround)
                         {
+                            player.playerGrid.cancel_locking_timer();
                             move_count--;
-                            std::cout << "Move count decreased to: " << move_count << std::endl;
                         }
                     }
-            } // event loop
-
-            
-            if (gameClock.getElapsedTime().asSeconds() >= paceTime.asSeconds()) 
-            {
-                gameClock.restart();
-                colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x, player.currentTetro.position.y + 1);
-                if (colision == 0){
-                    player.currentTetro.moveDown(1);
                 }
-                    
-                else if (colision == 2)
+
+                if (event.key.code == sf::Keyboard::Q)
                 {
-                    if (player.playerGrid.locking_tetro(player.currentTetro, move_count))
+                    colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x - 1, player.currentTetro.position.y);
+                    if (colision != 1)
                     {
-                        player.currentTetro = player.nextTetro;
-                        player.generateTetro(player.nextTetro);
-                        player.currentTetro.moveDown(2);
-                        move_count = 15;
+                        player.currentTetro.moveLeft();
+                        if (isTouchingGround)
+                        {
+                            player.playerGrid.cancel_locking_timer();
+                            move_count--;
+                        }
                     }
-
                 }
-                else if (colision == 3)
+
+                if (event.key.code == sf::Keyboard::D)
                 {
-                    gameOver();
-                }   
+                    colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x + 1, player.currentTetro.position.y);
+                    if (colision != 1)
+                    {
+                        player.currentTetro.moveRight();
+                        if (isTouchingGround)
+                        {
+                            player.playerGrid.cancel_locking_timer();
+                            move_count--;
+                        }
+                    }
+                }
+
+                if (event.key.code == sf::Keyboard::Z)
+                {
+                    auto newShape = player.currentTetro.getShape(1);
+                    int currentRotation = player.currentTetro.currentRotation;
+                    auto kick = player.playerGrid.try_wall_kicks(player.currentTetro, newShape, currentRotation);
+                    colision = player.playerGrid.check_collision(
+                        player.currentTetro, newShape, player.currentTetro.position.x + kick.first, player.currentTetro.position.y + kick.second);
+
+                    if (colision == 0 || colision == 1)
+                    {
+                        player.currentTetro.rotate();
+                        player.currentTetro.position.x += kick.first;
+                        player.currentTetro.position.y += kick.second;
+                        if (isTouchingGround)
+                        {
+                            player.playerGrid.cancel_locking_timer();
+                            move_count--;
+                        }
+                    }
+                }
             }
-            if (gameClock.getElapsedTime().asSeconds() >= 0.3f)
+            if (event.type == sf::Event::Closed)
             {
-                player.playerGrid.delete_full_rows(score);
-                
+                game::MainMenu menu(_window);
+                menu.start();
+                exit(0);
             }
-            player.hasMadeMove(event);
-            // paceTime = sf::seconds(0.5f - (static_cast<float>(score) * 0.08f));
-            _window.display();
-            _window.setFramerateLimit(60);
+        } // event loop
+
+        // Vérifier si la pièce touche le sol
+        colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x, player.currentTetro.position.y + 1);
+        isTouchingGround = (colision == 2);
+
+        if (gameClock.getElapsedTime().asSeconds() >= paceTime.asSeconds()) 
+        {
+            gameClock.restart();
+            if (colision == 0)
+            {
+                player.currentTetro.moveDown(1);
+            }
+            else if (colision == 2)
+            {
+                if (player.playerGrid.locking_tetro(player.currentTetro, move_count))
+                {
+                    player.currentTetro = player.nextTetro;
+                    player.generateTetro(player.nextTetro);
+                    player.currentTetro.moveDown(2);
+                    move_count = 15;
+                    isTouchingGround = false;
+                }
+            }
+            else if (colision == 3)
+            {
+                gameOver();
+            }   
         }
-    } // gameLoop()
+        
+        if (gameClock.getElapsedTime().asSeconds() >= 0.3f)
+        {
+            player.playerGrid.delete_full_rows(score);
+        }
+        
+        _window.display();
+        _window.setFramerateLimit(60);
+    }
+} // gameLoop() 
 
     void GameController::setupScene()
     {
@@ -170,6 +181,8 @@ namespace game
         }
 
         player.playerGrid.drawGrid(_window, player.currentTetro);
+
+        player.playerGrid.drawGhostTetro(_window, player.currentTetro);
     }
 
 
@@ -180,12 +193,6 @@ namespace game
         exit(0);
     }
 
-    // Mis en commentaire car je pense que c'est inutile
-
-    // bool checkCollision(const sf::RectangleShape &a, const sf::RectangleShape &b)
-    // {
-    //     return a.getGlobalBounds().intersects(b.getGlobalBounds());
-    // }
 
     sf::RectangleShape getRectangleAt(sf::Vector2f location, sf::Color color)
     {

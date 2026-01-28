@@ -46,6 +46,7 @@ public:
     void update_with_ghost_tetro(const Tetro &tetro, int state);
     void delete_full_rows(int &nbDestroyedLines);
     void drawGrid(sf::RenderWindow &window, const Tetro &currentTetro);
+    void drawGhostTetro(sf::RenderWindow &window, const Tetro &currentTetro);
 
     ~Grid()
     {}

@@ -78,6 +78,7 @@ bool Grid::locking_tetro(const Tetro &tetro, int move_count)
     return false;
 }
 
+
 int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int futureY)
 {
     for (int i = 0; i < 4; i++)
@@ -101,25 +102,25 @@ int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4
                     start_locking_timer();
                     return 2; // Collision avec le sol
                 }
-                
-                int indx_bottom = (tetro.position.y +1 + i) * columns + cibleX;
-                if (cells[indx_bottom] != 0 && cells[indx_bottom] != 1)
-                {
-                    if (tetro.position.y - 1 < 1)
-                        return 3;      // Collision avec le plafond
-                    start_locking_timer();
-                        return 2; // Collision avec le sol
-                    
-                }
 
+                // Vérifier collision avec cellules déjà occupées
                 int indx = cibleY * columns + cibleX;
                 if (cells[indx] != 0 && cells[indx] != 1)
                 {
-                    return 1; // Collision avec une pièce lockée sur les côtés
+                    // Vérifier si c'est une collision latérale ou verticale
+                    // En comparant avec la position actuelle
+                    if (cibleY == tetro.position.y + i) // Même ligne verticale
+                    {
+                        return 1; // Collision latérale
+                    }
+                    else // Différente ligne verticale
+                    {
+                        if (tetro.position.y < 2)
+                            return 3; // Collision avec le plafond
+                        start_locking_timer();
+                        return 2; // Collision par le bas
+                    }
                 }
-
-
-
             }   
         }
     }
@@ -184,15 +185,12 @@ std::pair<int, int> Grid::try_wall_kicks(const Tetro &tetro, const std::array<st
 
 void Grid::update_with_ghost_tetro(const Tetro &tetro, int state)
 {
-    for (int i = 0; i < rows * columns; i++)
-    {
-        if (cells[i] == 1)
-            cells[i] = 0;
-    }
-
-    const auto &shape = tetro.getShape(0);
+    // Ne pas effacer les cellules 1 ici, car on veut afficher le ghost ET la pièce actuelle
+    
+    const auto &shape = tetro.getShape(0); // Utiliser la rotation actuelle
     Tetro ghostTetro = tetro;
-    // Move the ghost tetro down until collision
+    
+    // Descendre le ghost tetro jusqu'à collision
     while (true)
     {
         int collision = check_collision(ghostTetro, shape, ghostTetro.position.x, ghostTetro.position.y + 1);
@@ -206,6 +204,7 @@ void Grid::update_with_ghost_tetro(const Tetro &tetro, int state)
         }
     }
 
+    // Dessiner le ghost sur la grille
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)
@@ -218,7 +217,11 @@ void Grid::update_with_ghost_tetro(const Tetro &tetro, int state)
                 if (gridX >= 0 && gridX < columns && gridY >= 0 && gridY < rows)
                 {
                     int idx = gridY * columns + gridX;
-                    cells[idx] = state;
+                    // Ne dessiner le ghost que si la cellule est vide ou contient la pièce actuelle
+                    if (cells[idx] == 0 || cells[idx] == 1)
+                    {
+                        cells[idx] = state;
+                    }
                 }
             }
         }
@@ -320,6 +323,66 @@ void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
             }
                 
             window.draw(cellShape);
+        }
+    }
+}
+
+void Grid::drawGhostTetro(sf::RenderWindow &window, const Tetro &currentTetro)
+{
+    int rows = this->rows - 2;
+    int cols = this->columns;
+    int cellSize = this->cellSize;
+    float pixelSize = static_cast<float>(cellSize * RESIZE_FACTOR);
+    float targetW = static_cast<float>(cols) * pixelSize;
+    float targetH = static_cast<float>(rows) * pixelSize;
+    float originX = (static_cast<float>(window.getSize().x) - targetW) / 2.f;
+    float originY = (static_cast<float>(window.getSize().y) - targetH) / 2.f;
+
+    sf::RectangleShape cellShape(sf::Vector2f(pixelSize, pixelSize));
+    cellShape.setOutlineThickness(2.f);
+    cellShape.setOutlineColor(currentTetro.color);
+    
+    // Couleur semi-transparente pour le ghost
+    sf::Color ghostColor = currentTetro.color;
+    ghostColor.a = 80; // Transparence (0-255)
+    cellShape.setFillColor(ghostColor);
+
+    // Calculer la position du ghost
+    const auto &shape = currentTetro.getShape(0);
+    Tetro ghostTetro = currentTetro;
+    
+    // Descendre jusqu'à collision
+    while (true)
+    {
+        int collision = check_collision(ghostTetro, shape, ghostTetro.position.x, ghostTetro.position.y + 1);
+        if (collision == 0)
+        {
+            ghostTetro.moveDown(1);
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    // Dessiner le ghost
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (shape[i][j] == 1)
+            {
+                int gridX = ghostTetro.position.x + j;
+                int gridY = ghostTetro.position.y + i - 2; // -2 pour l'offset des lignes cachées
+
+                if (gridX >= 0 && gridX < cols && gridY >= 0 && gridY < rows)
+                {
+                    float x = originX + gridX * pixelSize;
+                    float y = originY + gridY * pixelSize;
+                    cellShape.setPosition(x, y);
+                    window.draw(cellShape);
+                }
+            }
         }
     }
 }

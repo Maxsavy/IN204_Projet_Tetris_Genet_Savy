@@ -45,7 +45,6 @@ int Player::hasMadeMove(sf::Event &event)
 {
     if ((event.type == sf::Event::KeyPressed)&& (event.key.code == sf::Keyboard::Q || event.key.code == sf::Keyboard::D || event.key.code == sf::Keyboard::Z))
     {
-        std::cout << "Move made" << std::endl;
         return 1;
     }
     return 0;
