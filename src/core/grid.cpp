@@ -2,20 +2,6 @@
 #include "tetros.hpp"
 #include <iostream>
 
-/* Fonction de test de l'affichage de la grille dans le terminal 
-void Grid::display_terminal() const
-{
-    for (int i = 0; i < rows; i++)
-    {
-        for (int j = 0; j < columns; j++)
-        {
-            std::cout << cells[i * columns + j] << " ";
-        }
-        std::cout << std::endl;
-    }
-}
-*/
-
 void Grid::update_with_tetro(const Tetro &tetro, int state)
 {
     for (int i = 0; i < rows * columns; i++)
@@ -52,7 +38,6 @@ void Grid::start_locking_timer()
         locking = true;
         lockingDelayClock.restart();
     }
-    
 }
 
 void Grid::cancel_locking_timer()
@@ -62,7 +47,7 @@ void Grid::cancel_locking_timer()
 
 bool Grid::locking_tetro(const Tetro &tetro, int move_count)
 {
-    
+
     if (locking && lockingDelayClock.getElapsedTime().asSeconds() >= 0.5f)
     {
         update_with_tetro(tetro, tetro.colorRef);
@@ -77,7 +62,6 @@ bool Grid::locking_tetro(const Tetro &tetro, int move_count)
     }
     return false;
 }
-
 
 int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int futureY)
 {
@@ -121,24 +105,21 @@ int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4
                         return 2; // Collision par le bas
                     }
                 }
-            }   
+            }
         }
     }
     return 0; // Pas de collision
 }
-
-
-
 
 std::pair<int, int> Grid::try_wall_kicks(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &newShape, int currentRotation)
 {
     // Positions de test standard pour le wall kick (SRS - Super Rotation System)
     // Format: {offsetX, offsetY}
     std::vector<std::pair<int, int>> kickTests;
-    
+
     // Pour les pièces I, utilisez un système différent
     bool isIPiece = (tetro.colorRef == 2); // Supposant que I = colorRef 2
-    
+
     if (isIPiece)
     {
         // Wall kicks spéciaux pour la pièce I
@@ -163,33 +144,32 @@ std::pair<int, int> Grid::try_wall_kicks(const Tetro &tetro, const std::array<st
             {1, -1}   // Diagonale haut-droite
         };
     }
-    
+
     // Tester chaque position
-    for (const auto& kick : kickTests)
+    for (const auto &kick : kickTests)
     {
         int testX = tetro.position.x + kick.first;
         int testY = tetro.position.y + kick.second;
-        
+
         int collision = check_collision(tetro, newShape, testX, testY);
-        
+
         // Si pas de collision avec mur/pièce lockée (0 ou 2 acceptable si pas au sol)
         if (collision == 0)
         {
             return kick; // Retourne le décalage qui fonctionne
         }
     }
-    
+
     return {0, 0}; // Aucun kick n'a fonctionné
 }
-
 
 void Grid::update_with_ghost_tetro(const Tetro &tetro, int state)
 {
     // Ne pas effacer les cellules 1 ici, car on veut afficher le ghost ET la pièce actuelle
-    
+
     const auto &shape = tetro.getShape(0); // Utiliser la rotation actuelle
     Tetro ghostTetro = tetro;
-    
+
     // Descendre le ghost tetro jusqu'à collision
     while (true)
     {
@@ -244,7 +224,8 @@ void Grid::delete_full_rows(int &nbDestroyedLines)
 
         if (isFull)
         {
-            nbDestroyedLines++;
+            linesCleared++;
+            totalLinesCleared++;
             // Move all rows above down by one
             for (int k = i; k > 0; k--)
             {
@@ -262,18 +243,39 @@ void Grid::delete_full_rows(int &nbDestroyedLines)
     }
 }
 
-void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
+void Grid::drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro)
 {
-    this->update_with_tetro(currentTetro, 1);
-    int rows = this->rows-2;
-    int cols = this->columns;
-    int cellSize = this->cellSize;
-    float pixelSize = static_cast<float>(cellSize * RESIZE_FACTOR);
-    float targetW = static_cast<float>(cols) * pixelSize;
-    float targetH = static_cast<float>(rows) * pixelSize;
-    float originX = (static_cast<float>(window.getSize().x) - targetW) / 2.f;
-    float originY = (static_cast<float>(window.getSize().y) - targetH) / 2.f;
 
+    float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
+    float mainGridW = static_cast<float>(COLUMNS) * pixelSize;
+    float mainGridH = static_cast<float>(ROWS - 2) * pixelSize;
+    float mainOriginX = (static_cast<float>(window.getSize().x) - mainGridW) / 2.f;
+    float mainOriginY = (static_cast<float>(window.getSize().y) - mainGridH) / 2.f;
+    float nextGridOffsetX = mainOriginX + mainGridW + 30.f;
+    float nextGridOffsetY = mainOriginY;
+
+    nextTetro.setPosition(1, -1);
+    this->update_with_tetro(nextTetro, 1);
+    drawGrid(window, nextTetro, 6, 6, nextGridOffsetX, nextGridOffsetY, pixelSize);
+    nextTetro.setPosition(3, -1);
+}
+
+void Grid::drawGameGrid(sf::RenderWindow &window, const Tetro &tetro, int rows, const int cols)
+{
+    this->update_with_tetro(tetro, 1);
+    rows = rows - 2;
+    int cellSize = this->cellSize;
+    float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
+    float mainGridW = static_cast<float>(cols) * pixelSize;
+    float mainGridH = static_cast<float>(rows - 2) * pixelSize;
+    float mainOriginX = (static_cast<float>(window.getSize().x) - mainGridW) / 2.f;
+    float mainOriginY = (static_cast<float>(window.getSize().y) - mainGridH) / 2.f;
+
+    drawGrid(window, tetro, rows, cols, mainOriginX, mainOriginY, pixelSize);
+}
+
+void Grid::drawGrid(sf::RenderWindow &window, const Tetro &tetro, int rows, const int cols, float originX, float originY, float pixelSize)
+{
     sf::RectangleShape cellShape(sf::Vector2f(pixelSize, pixelSize));
     cellShape.setOutlineThickness(1.f);
     cellShape.setOutlineColor(sf::Color(100, 100, 100));
@@ -285,7 +287,8 @@ void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
             float x = originX + j * pixelSize;
             float y = originY + i * pixelSize;
             cellShape.setPosition(x, y);
-            int idx = j + (i+2) * cols;
+            int rowOffset = (cols == 6) ? -2 : 2;
+            int idx = j + (i + rowOffset) * this->columns;
             int val = 0;
             if (idx >= 0 && idx < static_cast<int>(this->cells.size()))
                 val = this->cells[idx];
@@ -293,7 +296,7 @@ void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
             if (val == 0)
                 cellShape.setFillColor(sf::Color::Black);
             else if (val == 1)
-                cellShape.setFillColor(currentTetro.color); // active piece with its color
+                cellShape.setFillColor(tetro.color); // active piece with its color
             else if (val != 0 && val != 1)
             {
                 switch (val)
@@ -303,7 +306,7 @@ void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
                     break;
                 case 3:
                     cellShape.setFillColor(sf::Color::Blue); // J piece
-                    break;  
+                    break;
                 case 4:
                     cellShape.setFillColor(sf::Color(255, 165, 0)); // L piece
                     break;
@@ -321,7 +324,7 @@ void Grid::drawGrid(sf::RenderWindow &window, const Tetro &currentTetro)
                     break;
                 }
             }
-                
+
             window.draw(cellShape);
         }
     }
@@ -341,7 +344,7 @@ void Grid::drawGhostTetro(sf::RenderWindow &window, const Tetro &currentTetro)
     sf::RectangleShape cellShape(sf::Vector2f(pixelSize, pixelSize));
     cellShape.setOutlineThickness(2.f);
     cellShape.setOutlineColor(currentTetro.color);
-    
+
     // Couleur semi-transparente pour le ghost
     sf::Color ghostColor = currentTetro.color;
     ghostColor.a = 80; // Transparence (0-255)
@@ -350,7 +353,7 @@ void Grid::drawGhostTetro(sf::RenderWindow &window, const Tetro &currentTetro)
     // Calculer la position du ghost
     const auto &shape = currentTetro.getShape(0);
     Tetro ghostTetro = currentTetro;
-    
+
     // Descendre jusqu'à collision
     while (true)
     {

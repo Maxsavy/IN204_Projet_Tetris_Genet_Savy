@@ -22,6 +22,8 @@ public:
     int rows;
     int columns;
     int cellSize;
+    int linesCleared = 0;
+    int totalLinesCleared = 0;
     std::vector<int> cells;
 
     Grid() : rows(22), columns(10), cellSize(8)
@@ -36,19 +38,23 @@ public:
         }
     }
 
-    // void display_terminal() const;
+    void display_terminal() const;
+    int check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int FutureY) const;
     void update_with_tetro(const Tetro &tetro, int state);
+    void delete_full_rows();
+    void drawGrid(sf::RenderWindow &window, const Tetro &currentTetro, const int rows, const int cols, float originX = 0.f, float originY = 0.f, float pixelSize = CELL_SIZE * RESIZE_FACTOR);
+    void drawGameGrid(sf::RenderWindow &window, const Tetro &currentTetro, const int rows, const int cols);
+    void drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro);
     void start_locking_timer();
     void cancel_locking_timer();
     bool locking_tetro(const Tetro &tetro, int move_count);
     int check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int FutureY);
     std::pair<int, int> try_wall_kicks(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &newShape, int currentRotation);
     void update_with_ghost_tetro(const Tetro &tetro, int state);
-    void delete_full_rows(int &nbDestroyedLines);
-    void drawGrid(sf::RenderWindow &window, const Tetro &currentTetro);
     void drawGhostTetro(sf::RenderWindow &window, const Tetro &currentTetro);
 
     ~Grid()
-    {}
+    {
+    }
 };
 #endif // GRID_HPP
