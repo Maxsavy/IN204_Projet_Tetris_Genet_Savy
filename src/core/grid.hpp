@@ -24,6 +24,10 @@ public:
     int cellSize;
     int linesCleared = 0;
     int totalLinesCleared = 0;
+    float originX = 0.0f;
+    float originY = 0.0f;
+    int playerId = 0;
+    int gameMode = 1;
     std::vector<int> cells;
 
     Grid() : rows(22), columns(10), cellSize(8)
@@ -43,8 +47,9 @@ public:
     void update_with_tetro(const Tetro &tetro, int state);
     std::vector<int> delete_full_rows();
     void draw_deleted_row_animation(sf::RenderWindow &window, const std::vector<int> &deletedRow);
+    void setGridPosition(int mode, int pId, float windowWidth, float windowHeight);
     void drawGrid(sf::RenderWindow &window, const Tetro &currentTetro, const int rows, const int cols, float originX = 0.f, float originY = 0.f, float pixelSize = CELL_SIZE * RESIZE_FACTOR);
-    void drawGameGrid(sf::RenderWindow &window, const Tetro &currentTetro, const int rows, const int cols);
+    void drawGameGrid(sf::RenderWindow &window, const Tetro &currentTetro);
     void drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro);
     void start_locking_timer();
     void cancel_locking_timer();

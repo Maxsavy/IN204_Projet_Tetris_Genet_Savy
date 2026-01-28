@@ -246,35 +246,56 @@ std::vector<int> Grid::delete_full_rows()
     return fullRows;
 }
 
-void Grid::drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro)
+void Grid::setGridPosition(int mode, int pId, float windowWidth, float windowHeight)
 {
+    gameMode = mode;
+    playerId = pId;
 
     float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
-    float mainGridW = static_cast<float>(COLUMNS) * pixelSize;
-    float mainGridH = static_cast<float>(ROWS - 2) * pixelSize;
-    float mainOriginX = (static_cast<float>(window.getSize().x) - mainGridW) / 2.f;
-    float mainOriginY = (static_cast<float>(window.getSize().y) - mainGridH) / 2.f;
-    float nextGridOffsetX = mainOriginX + mainGridW + 30.f;
-    float nextGridOffsetY = mainOriginY;
+    float gridWidth = static_cast<float>(columns) * pixelSize;
+    float gridHeight = static_cast<float>(rows - 2) * pixelSize;
+
+    if (mode == 1)
+    {
+        originX = (windowWidth - gridWidth) / 2.0f;
+        originY = (windowHeight - gridHeight) / 2.0f;
+    }
+    else if (mode == 2)
+    {
+        if (pId == 0)
+        {
+            originX = (windowWidth / 4.0f) - (gridWidth / 2.0f);
+            originY = (windowHeight - gridHeight) / 2.0f;
+        }
+        else
+        {
+            originX = (3.0f * windowWidth / 4.0f) - (gridWidth / 2.0f);
+            originY = (windowHeight - gridHeight) / 2.0f;
+        }
+    }
+}
+
+void Grid::drawGameGrid(sf::RenderWindow &window, const Tetro &tetro)
+{
+    this->update_with_tetro(tetro, 1);
+    int visibleRows = rows - 2;
+    float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
+
+    drawGrid(window, tetro, visibleRows, columns, originX, originY, pixelSize);
+}
+
+void Grid::drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro)
+{
+    float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
+    float gridWidth = static_cast<float>(columns) * pixelSize;
+
+    float nextGridX = originX + gridWidth + 30.0f;
+    float nextGridY = originY;
 
     nextTetro.setPosition(1, -1);
     this->update_with_tetro(nextTetro, 1);
-    drawGrid(window, nextTetro, 6, 6, nextGridOffsetX, nextGridOffsetY, pixelSize);
+    drawGrid(window, nextTetro, 6, 6, nextGridX, nextGridY, pixelSize);
     nextTetro.setPosition(3, -1);
-}
-
-void Grid::drawGameGrid(sf::RenderWindow &window, const Tetro &tetro, int rows, const int cols)
-{
-    this->update_with_tetro(tetro, 1);
-    rows = rows - 2;
-    int cellSize = this->cellSize;
-    float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
-    float mainGridW = static_cast<float>(cols) * pixelSize;
-    float mainGridH = static_cast<float>(rows - 2) * pixelSize;
-    float mainOriginX = (static_cast<float>(window.getSize().x) - mainGridW) / 2.f;
-    float mainOriginY = (static_cast<float>(window.getSize().y) - mainGridH) / 2.f;
-
-    drawGrid(window, tetro, rows, cols, mainOriginX, mainOriginY, pixelSize);
 }
 
 void Grid::drawGrid(sf::RenderWindow &window, const Tetro &tetro, int rows, const int cols, float originX, float originY, float pixelSize)
@@ -335,32 +356,25 @@ void Grid::drawGrid(sf::RenderWindow &window, const Tetro &tetro, int rows, cons
 
 void Grid::drawGhostTetro(sf::RenderWindow &window, const Tetro &currentTetro)
 {
-    int rows = this->rows - 2;
-    int cols = this->columns;
-    int cellSize = this->cellSize;
+    int visibleRows = rows - 2;
     float pixelSize = static_cast<float>(cellSize * RESIZE_FACTOR);
-    float targetW = static_cast<float>(cols) * pixelSize;
-    float targetH = static_cast<float>(rows) * pixelSize;
-    float originX = (static_cast<float>(window.getSize().x) - targetW) / 2.f;
-    float originY = (static_cast<float>(window.getSize().y) - targetH) / 2.f + pixelSize;
 
     sf::RectangleShape cellShape(sf::Vector2f(pixelSize, pixelSize));
     cellShape.setOutlineThickness(2.f);
     cellShape.setOutlineColor(currentTetro.color);
 
-    // Couleur semi-transparente pour le ghost
     sf::Color ghostColor = currentTetro.color;
-    ghostColor.a = 80; // Transparence (0-255)
+    ghostColor.a = 80;
     cellShape.setFillColor(ghostColor);
 
-    // Calculer la position du ghost
     const auto &shape = currentTetro.getShape(0);
     Tetro ghostTetro = currentTetro;
 
-    // Descendre jusqu'à collision
     while (true)
     {
-        int collision = check_collision(ghostTetro, shape, ghostTetro.position.x, ghostTetro.position.y + 1);
+        int collision = check_collision(ghostTetro, shape,
+                                        ghostTetro.position.x,
+                                        ghostTetro.position.y + 1);
         if (collision == 0)
         {
             ghostTetro.moveDown(1);
@@ -371,7 +385,6 @@ void Grid::drawGhostTetro(sf::RenderWindow &window, const Tetro &currentTetro)
         }
     }
 
-    // Dessiner le ghost
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)
@@ -379,9 +392,9 @@ void Grid::drawGhostTetro(sf::RenderWindow &window, const Tetro &currentTetro)
             if (shape[i][j] == 1)
             {
                 int gridX = ghostTetro.position.x + j;
-                int gridY = ghostTetro.position.y + i - 2; // -2 pour l'offset des lignes cachées
+                int gridY = ghostTetro.position.y + i - 2;
 
-                if (gridX >= 0 && gridX < cols && gridY >= 0 && gridY < rows)
+                if (gridX >= 0 && gridX < columns && gridY >= 0 && gridY < visibleRows)
                 {
                     float x = originX + gridX * pixelSize;
                     float y = originY + gridY * pixelSize;
@@ -393,15 +406,11 @@ void Grid::drawGhostTetro(sf::RenderWindow &window, const Tetro &currentTetro)
     }
 }
 
-
-
 void Grid::draw_deleted_row_animation(sf::RenderWindow &window, const std::vector<int> &deletedRow)
 {
     float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
     float mainGridW = static_cast<float>(columns) * pixelSize;
     float mainGridH = static_cast<float>(rows - 2) * pixelSize;
-    float mainOriginX = (static_cast<float>(window.getSize().x) - mainGridW) / 2.f;
-    float mainOriginY = (static_cast<float>(window.getSize().y) - mainGridH) / 2.f;
 
     sf::RectangleShape cellShape(sf::Vector2f(pixelSize, pixelSize));
     cellShape.setOutlineThickness(1.f);
@@ -414,12 +423,12 @@ void Grid::draw_deleted_row_animation(sf::RenderWindow &window, const std::vecto
             for (int row : deletedRow)
             {
                 // Effacer de l'intérieur vers l'extérieur
-                float xLeft = mainOriginX + j * pixelSize + step / 2.f;
-                float y = mainOriginY + (row - 1) * pixelSize; // -2 pour l'offset des lignes cachées
+                float xLeft = originX + j * pixelSize + step / 2.f;
+                float y = originY + (row - 2) * pixelSize; // -2 pour l'offset des lignes cachées
                 cellShape.setPosition(xLeft, y);
                 cellShape.setSize(sf::Vector2f(pixelSize - step, pixelSize));
-            cellShape.setFillColor(sf::Color::Black);
-            window.draw(cellShape);
+                cellShape.setFillColor(sf::Color::Black);
+                window.draw(cellShape);
             }
         }
         window.display();

@@ -32,5 +32,6 @@ namespace game
         bool _is_exit_requested = false;
         bool _return_to_main_menu = false;
         bool _resume_game = false;
+        int last_selected_mode;
     };
 } // namespace game
