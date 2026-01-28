@@ -1,9 +1,6 @@
 Anouck 100000 20
 Tiagz 6900 4
+Encore  tiag 6400 3
 Bazaza 1800 12
 Max 1500 10
 Yeti 1200 8
-oui 1100 2
-maxos 420 1
-nathan 40 1
-le 2 40
