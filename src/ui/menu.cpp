@@ -120,11 +120,19 @@ namespace game
                                .ItemAlign = game_menu::Align::Center};
 
         std::vector<game_menu::MenuItem> items{
-            {"New Game",
+            {"New  Solo  Game",
              [&](sf::RenderTarget &target)
              {
                  game::GameController gameController(_window);
-                 gameController.start();
+                 last_selected_mode = 1;
+                 gameController.start(1);
+             }},
+            {"New  Split Screen Game",
+             [&](sf::RenderTarget &target)
+             {
+                 game::GameController gameController(_window);
+                 last_selected_mode = 2;
+                 gameController.start(2);
              }},
             {"Leaderboard", [](sf::RenderTarget &target)
              {
@@ -175,7 +183,7 @@ namespace game
              [&](sf::RenderTarget &target)
              {
                  game::GameController gameController(_window);
-                 gameController.start();
+                 gameController.start(last_selected_mode);
              }},
             {"Return  to  Menu", [&](sf::RenderTarget &target)
              {
@@ -226,7 +234,7 @@ namespace game
              {
                  _resume_game = false;
                  GameController gameController(_window);
-                 gameController.start();
+                 gameController.start(last_selected_mode);
              }},
             {"Return  to  Menu", [&](sf::RenderTarget &target)
              {

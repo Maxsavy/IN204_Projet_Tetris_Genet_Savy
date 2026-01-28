@@ -30,7 +30,9 @@ public:
     void generateTetro(Tetro &tempTetro);
     int hasMadeMove(sf::Event &event);
     void updateScore(int linesCleared);
-    void drawDetails(sf::RenderWindow &window, sf::Font &font);
+    void drawDetails(sf::RenderWindow &window, sf::Font &font, int modePlayed, int playerID);
+    void initializeSinglePlayer();
+    void initializeSplitScreenPlayer(int id);
 };
 
 #endif

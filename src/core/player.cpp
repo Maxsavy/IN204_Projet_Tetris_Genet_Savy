@@ -50,38 +50,60 @@ int Player::hasMadeMove(sf::Event &event)
     return 0;
 }
 
-void Player::drawDetails(sf::RenderWindow &window, sf::Font &font)
+void Player::drawDetails(sf::RenderWindow &window, sf::Font &font, int modePlayed, int playerID)
 {
     float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
-    float mainGridW = static_cast<float>(COLUMNS) * pixelSize;
-    float mainGridH = static_cast<float>(ROWS - 2) * pixelSize;
-    float mainOriginX = (static_cast<float>(window.getSize().x) - mainGridW) / 2.f;
-    float mainOriginY = (static_cast<float>(window.getSize().y) - mainGridH) / 2.f;
-    float offsetX = mainOriginX + mainGridW + 30.f;
-    float offsetY = mainOriginY + 200.f;
+    float gridWidth = static_cast<float>(COLUMNS) * pixelSize;
+
+    float offsetX = playerGrid.originX + gridWidth + 30.f;
+    float offsetY = playerGrid.originY + 200.f;
+
+    int scoreSize = (modePlayed == 2) ? 35 : 50;
+    int levelSize = (modePlayed == 2) ? 30 : 40;
+    int linesSize = (modePlayed == 2) ? 30 : 35;
+    float verticalSpacing = (modePlayed == 2) ? 50.f : 70.f;
+
+    if (modePlayed == 2)
+    {
+        sf::Text playerLabel;
+        playerLabel.setFont(font);
+        playerLabel.setString("P" + std::to_string(playerID + 1));
+        playerLabel.setCharacterSize(40);
+        playerLabel.setFillColor(sf::Color::Yellow);
+        playerLabel.setPosition(offsetX, offsetY - 70.f);
+        window.draw(playerLabel);
+    }
 
     sf::Text scoreText;
     scoreText.setFont(font);
-    scoreText.setString("Score  " + std::to_string(score));
-    scoreText.setCharacterSize(50);
+    scoreText.setString("Score");
+    scoreText.setCharacterSize(scoreSize);
     scoreText.setFillColor(sf::Color::White);
     scoreText.setPosition(offsetX, offsetY);
     window.draw(scoreText);
 
+    sf::Text scoreValue;
+    scoreValue.setFont(font);
+    scoreValue.setString(std::to_string(score));
+    scoreValue.setCharacterSize(scoreSize - 5);
+    scoreValue.setFillColor(sf::Color::Cyan);
+    scoreValue.setPosition(offsetX, offsetY + 35.f);
+    window.draw(scoreValue);
+
     sf::Text levelText;
     levelText.setFont(font);
     levelText.setString("Level  " + std::to_string(level));
-    levelText.setCharacterSize(40);
+    levelText.setCharacterSize(levelSize);
     levelText.setFillColor(sf::Color::White);
-    levelText.setPosition(offsetX, offsetY + 70.f);
+    levelText.setPosition(offsetX, offsetY + verticalSpacing + 35.f);
     window.draw(levelText);
 
     sf::Text linesText;
     linesText.setFont(font);
-    linesText.setString("Lines Cleared " + std::to_string(playerGrid.totalLinesCleared));
-    linesText.setCharacterSize(35);
+    linesText.setString("Lines  " + std::to_string(playerGrid.totalLinesCleared));
+    linesText.setCharacterSize(linesSize);
     linesText.setFillColor(sf::Color::White);
-    linesText.setPosition(offsetX, offsetY + 130.f);
+    linesText.setPosition(offsetX, offsetY + (verticalSpacing * 2.f) + 35.f);
     window.draw(linesText);
 }
 
@@ -104,4 +126,18 @@ void Player::updateScore(int linesCleared)
     default:
         break;
     }
+}
+
+void Player::initializeSinglePlayer()
+{
+    generateTetro(currentTetro);
+    generateTetro(nextTetro);
+}
+
+void Player::initializeSplitScreenPlayer(int id)
+{
+    this->id = id;
+
+    generateTetro(currentTetro);
+    generateTetro(nextTetro);
 }
