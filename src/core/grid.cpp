@@ -51,12 +51,14 @@ bool Grid::locking_tetro(const Tetro &tetro, int move_count)
     if (locking && lockingDelayClock.getElapsedTime().asSeconds() >= 0.5f)
     {
         update_with_tetro(tetro, tetro.colorRef);
+        lockSound.play();
         locking = false;
         return true;
     }
     else if (move_count <= 0)
     {
         update_with_tetro(tetro, tetro.colorRef);
+        lockSound.play();
         locking = false;
         return true;
     }
@@ -431,6 +433,7 @@ void Grid::draw_deleted_row_animation(sf::RenderWindow &window, const std::vecto
                 window.draw(cellShape);
             }
         }
+        lineClearSound.play();
         window.display();
         sf::sleep(sf::milliseconds(30));
     }

@@ -38,12 +38,23 @@ namespace game
 
                 if (event.type == sf::Event::KeyPressed)
                 {
+
+                    if (event.key.code == sf::Keyboard::Z || 
+                    event.key.code == sf::Keyboard::S ||
+                    event.key.code == sf::Keyboard::Up ||
+                    event.key.code == sf::Keyboard::Down)
+                    {
+                        _select_sound.play();  
+                    }
+
                     if (event.key.code == sf::Keyboard::Z)
                     {
+
                         event.key.code = sf::Keyboard::Up;
                     }
                     else if (event.key.code == sf::Keyboard::S)
                     {
+
                         event.key.code = sf::Keyboard::Down;
                     }
                 }
@@ -223,9 +234,19 @@ namespace game
         else
         {
             _background_music.setLoop(true);  // Active la boucle automatique
-            _background_music.setVolume(50);   // Volume à 50% (optionnel)
+            _background_music.setVolume(30);   // Volume à 30% (optionnel)
             _background_music.play();         // Démarre la lecture de la musique
         }
+
+        if (!_select_sound.openFromFile("assets/sounds/button_sound.mp3"))
+        {
+            cerr << "Failed to load select sound file" << endl;
+        }
+        else
+        {
+            _select_sound.setVolume(100);   // Volume à 100% (optionnel)
+        }
+
 
         game_menu::Style style{.TitleFont = &_font,
                                .ItemFont = &_font,
@@ -255,6 +276,7 @@ namespace game
                 last_selected_mode = 1;
                  game::GameController gameController(_window);
                  std::cout << "Starting solo game with mode " << last_selected_mode << std::endl;
+                 _background_music.stop();
                  gameController.start(last_selected_mode);
              }},
             {"New  Split Screen Game",
@@ -263,9 +285,8 @@ namespace game
                 last_selected_mode = 2;
                  game::GameController gameController(_window);
                  std::cout << "Starting split screen game with mode " << last_selected_mode << std::endl;
-                 gameController.start(last_selected_mode);
                  _background_music.stop();
-                 gameController.start();  
+                 gameController.start(last_selected_mode);
              }},
             {"Leaderboard", [](sf::RenderTarget &target)
              {
@@ -408,6 +429,14 @@ namespace game
 
                 if (event.type == sf::Event::KeyPressed)
                 {
+                    if (event.key.code == sf::Keyboard::Z || 
+                    event.key.code == sf::Keyboard::S ||
+                    event.key.code == sf::Keyboard::Up ||
+                    event.key.code == sf::Keyboard::Down)
+                    {
+                        _select_sound.play();  
+                    }
+                    
                     if (event.key.code == sf::Keyboard::Z)
                     {
                         event.key.code = sf::Keyboard::Up;

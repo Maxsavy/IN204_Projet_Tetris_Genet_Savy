@@ -28,6 +28,7 @@ namespace game
         sf::RenderWindow &_window;
         sf::Font _font;
         sf::Music _background_music;
+        sf::Music _select_sound;
         game_menu::MENU *_current_menu;
         std::unique_ptr<game_menu::MENU, std::function<void(game_menu::MENU *)>>
             _main_menu_context;

@@ -20,7 +20,7 @@ namespace game
         else
         {
             _game_music.setLoop(true);
-            _game_music.setVolume(40);
+            _game_music.setVolume(30);
         }
     }
 
@@ -166,6 +166,7 @@ namespace game
             if (collision == 0)
             {
                 p.currentTetro.moveDown(1);
+                p.moveSound.play();
                 if (isTouchingGround)
                 {
                     p.playerGrid.cancel_locking_timer();
@@ -182,6 +183,7 @@ namespace game
             if (collision != 1)
             {
                 p.currentTetro.moveLeft();
+                p.moveSound.play();
                 if (isTouchingGround)
                 {
                     p.playerGrid.cancel_locking_timer();
@@ -198,6 +200,7 @@ namespace game
             if (collision != 1)
             {
                 p.currentTetro.moveRight();
+                p.moveSound.play();
                 if (isTouchingGround)
                 {
                     p.playerGrid.cancel_locking_timer();
@@ -219,6 +222,7 @@ namespace game
             if (collision == 0 || collision == 1)
             {
                 p.currentTetro.rotate();
+                p.moveSound.play();
                 p.currentTetro.position.x += kick.first;
                 p.currentTetro.position.y += kick.second;
                 if (isTouchingGround)
