@@ -1,21 +1,17 @@
 #include <SFML/Graphics.hpp>
+#include "ui/menu.hpp"
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+unsigned int windowWidth = 1920;
+unsigned int windowHeight = 1080;
 
 int main()
 {
-    auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "CMake SFML Project");
-    window.setFramerateLimit(144);
-
-    while (window.isOpen())
-    {
-        while (const std::optional event = window.pollEvent())
-        {
-            if (event->is<sf::Event::Closed>())
-            {
-                window.close();
-            }
-        }
-
-        window.clear();
-        window.display();
-    }
+    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Tetris");
+    game::MainMenu menu(window);
+    menu.start();
+    return 0;
 }
