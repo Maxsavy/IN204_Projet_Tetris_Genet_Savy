@@ -45,10 +45,11 @@ namespace game
     {
     public:
         GameController(sf::RenderWindow &w);
-        Player player;
+        Player player[2];
         sf::Clock gameClock;
+        int modePLayed;
         void gameLoop();
-        void start();
+        void start(int mode);
 
     private:
         void setupScene();
@@ -57,6 +58,7 @@ namespace game
         void loadResources();
         void loadTexture(sf::Texture &texture, const std::string &file, sf::Sprite &sprite);
         void setUpBackground(sf::Texture &texture, sf::Sprite &sprite);
+        void handlePlayerInput(int playerId, sf::Event &event, int &moveCount, bool &isTouchingGround);
 
         //    Grid grid;
         sf::Texture background;
@@ -76,6 +78,6 @@ namespace game
 
     }; // class game
 
-} // namespace game
+}; // namespace game
 
 #endif // GAME_HPP

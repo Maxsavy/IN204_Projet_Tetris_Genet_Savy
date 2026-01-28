@@ -12,14 +12,18 @@ namespace game
     class MainMenu
     {
     public:
+        int last_selected_mode = 2;
+
         MainMenu(sf::RenderWindow &w);
         void start();
-        void showGameOverMenu();
+        void showGameOverMenu(int finalScore = 0, int finalLevel = 1);
         void showPauseMenu(GameController *gameController);
+        void setup_menu_context();
 
     private:
-        void setup_menu_context();
+        
         void setup_game_over_menu();
+        void setup_pause_menu();
 
         sf::RenderWindow &_window;
         sf::Font _font;
@@ -34,5 +38,6 @@ namespace game
         bool _is_exit_requested = false;
         bool _return_to_main_menu = false;
         bool _resume_game = false;
+        
     };
 } // namespace game

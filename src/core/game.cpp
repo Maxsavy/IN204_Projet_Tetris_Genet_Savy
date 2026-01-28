@@ -24,35 +24,52 @@ namespace game
         }
     }
 
-    void GameController::start()
+    void GameController::start(int mode)
     {
+        this->modePLayed = mode;
         loadResources();
-        float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
-        float targetW = static_cast<float>(COLUMNS) * pixelSize;
-        float originX = (static_cast<float>(_window.getSize().x) - targetW) / 2.f;
-        float originY = (static_cast<float>(_window.getSize().y) - static_cast<float>(ROWS) * pixelSize) / 2.f;
+        float windowW = static_cast<float>(_window.getSize().x);
+        float windowH = static_cast<float>(_window.getSize().y);
 
+        if (mode == 1)
+        {
+            player[0].initializeSinglePlayer();
+            player[0].playerGrid.setGridPosition(1, 0, windowW, windowH);
+        }
+        else if (mode == 2)
+        {
+            player[0].initializeSplitScreenPlayer(0);
+            player[0].playerGrid.setGridPosition(2, 0, windowW, windowH);
+            player[1].initializeSplitScreenPlayer(1);
+            player[1].playerGrid.setGridPosition(2, 1, windowW, windowH);
+        }
         _game_music.play();
-        player.generateTetro(player.currentTetro);
-        player.generateTetro(player.nextTetro);
+
         gameLoop();
     }
 
     void GameController::gameLoop()
     {
-        bool loopInvarient = true;
         sf::Time paceTime = sf::seconds(0.5f);
-        int move_count = 15;
-        bool isTouchingGround = false;
-        float scaleX = static_cast<float>(_window.getSize().x);
-        float scaleY = static_cast<float>(_window.getSize().y);
-        while (loopInvarient && _window.isOpen())
+
+        int moveCount[2] = {15, 15};
+        bool isTouchingGround[2] = {false, false};
+
+        int numPlayers = (modePLayed == 2) ? 2 : 1;
+
+        while (_window.isOpen())
         {
             setupScene();
-            int colision;
+
             sf::Event event;
             while (_window.pollEvent(event))
             {
+                if (event.type == sf::Event::Closed)
+                {
+                    _window.close();
+                    return;
+                }
+
                 if (event.type == sf::Event::KeyPressed)
                 {
                     if (event.key.code == sf::Keyboard::Escape)
@@ -61,119 +78,157 @@ namespace game
                         pause();
                     }
 
-                    if (event.key.code == sf::Keyboard::S)
-                    {
-                        colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x, player.currentTetro.position.y + 1);
-                        if (colision == 0)
-                        {
-                            player.currentTetro.moveDown(1);
-                            if (isTouchingGround)
-                            {
-                                player.playerGrid.cancel_locking_timer();
-                                move_count--;
-                            }
-                        }
-                    }
+                    handlePlayerInput(0, event, moveCount[0], isTouchingGround[0]);
 
-                    if (event.key.code == sf::Keyboard::Q)
+                    if (modePLayed == 2)
                     {
-                        colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x - 1, player.currentTetro.position.y);
-                        if (colision != 1)
-                        {
-                            player.currentTetro.moveLeft();
-                            if (isTouchingGround)
-                            {
-                                player.playerGrid.cancel_locking_timer();
-                                move_count--;
-                            }
-                        }
+                        handlePlayerInput(1, event, moveCount[1], isTouchingGround[1]);
                     }
-
-                    if (event.key.code == sf::Keyboard::D)
-                    {
-                        colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x + 1, player.currentTetro.position.y);
-                        if (colision != 1)
-                        {
-                            player.currentTetro.moveRight();
-                            if (isTouchingGround)
-                            {
-                                player.playerGrid.cancel_locking_timer();
-                                move_count--;
-                            }
-                        }
-                    }
-
-                    if (event.key.code == sf::Keyboard::Z)
-                    {
-                        auto newShape = player.currentTetro.getShape(1);
-                        int currentRotation = player.currentTetro.currentRotation;
-                        auto kick = player.playerGrid.try_wall_kicks(player.currentTetro, newShape, currentRotation);
-                        colision = player.playerGrid.check_collision(
-                            player.currentTetro, newShape, player.currentTetro.position.x + kick.first, player.currentTetro.position.y + kick.second);
-
-                        if (colision == 0 || colision == 1)
-                        {
-                            player.currentTetro.rotate();
-                            player.currentTetro.position.x += kick.first;
-                            player.currentTetro.position.y += kick.second;
-                            if (isTouchingGround)
-                            {
-                                player.playerGrid.cancel_locking_timer();
-                                move_count--;
-                            }
-                        }
-                    }
-                }
-                if (event.type == sf::Event::Closed)
-                {
-                    loopInvarient = false;
-                    break;
                 }
             } // event loop
 
-            // Vérifier si la pièce touche le sol
-            colision = player.playerGrid.check_collision(player.currentTetro, player.currentTetro.getShape(0), player.currentTetro.position.x, player.currentTetro.position.y + 1);
-            isTouchingGround = (colision == 2);
+            for (int p = 0; p < numPlayers; p++)
+            {
+
+                int collision = player[p].playerGrid.check_collision(
+                    player[p].currentTetro,
+                    player[p].currentTetro.getShape(0),
+                    player[p].currentTetro.position.x,
+                    player[p].currentTetro.position.y + 1);
+                isTouchingGround[p] = (collision == 2);
+
+                if (gameClock.getElapsedTime().asSeconds() >= paceTime.asSeconds())
+                {
+                    if (collision == 0)
+                    {
+                        player[p].currentTetro.moveDown(1);
+                    }
+                    else if (collision == 2)
+                    {
+
+                        if (player[p].playerGrid.locking_tetro(player[p].currentTetro, moveCount[p]))
+                        {
+                            player[p].currentTetro = player[p].nextTetro;
+                            player[p].generateTetro(player[p].nextTetro);
+                            player[p].currentTetro.moveDown(2);
+                            moveCount[p] = 15;
+                            isTouchingGround[p] = false;
+                        }
+                    }
+                    else if (collision == 3)
+                    {
+                        gameOver();
+                        return;
+                    }
+                }
+
+                if (gameClock.getElapsedTime().asSeconds() >= 0.3f)
+                {
+                    std::vector<int> deletedRows = player[p].playerGrid.delete_full_rows();
+                    if (!deletedRows.empty())
+                    {
+                        player[p].playerGrid.draw_deleted_row_animation(_window, deletedRows);
+                    }
+                    player[p].updateScore(player[p].playerGrid.linesCleared);
+                    player[p].playerGrid.linesCleared = 0;
+                }
+
+                player[p].level = player[p].playerGrid.totalLinesCleared / 10 + 1;
+            }
 
             if (gameClock.getElapsedTime().asSeconds() >= paceTime.asSeconds())
             {
                 gameClock.restart();
-                if (colision == 0)
-                {
-                    player.currentTetro.moveDown(1);
-                }
-                else if (colision == 2)
-                {
-                    if (player.playerGrid.locking_tetro(player.currentTetro, move_count))
-                    {
-                        player.currentTetro = player.nextTetro;
-                        player.generateTetro(player.nextTetro);
-                        player.currentTetro.moveDown(2);
-                        move_count = 15;
-                        isTouchingGround = false;
-                    }
-                }
-                else if (colision == 3)
-                {
-                    gameOver();
-                }
             }
-            
-            if (gameClock.getElapsedTime().asSeconds() >= 0.3f)
-            {
-                std::vector<int> deletedRows = player.playerGrid.delete_full_rows();
-                if (!deletedRows.empty())
-                    player.playerGrid.draw_deleted_row_animation(_window, deletedRows);
-                player.updateScore(player.playerGrid.linesCleared);
-                player.playerGrid.linesCleared = 0;
-            }
+
+            paceTime = sf::seconds(0.5f - (static_cast<float>(player[0].playerGrid.totalLinesCleared / 10) * 0.08f));
 
             _window.display();
             _window.setFramerateLimit(60);
-            player.level = player.playerGrid.totalLinesCleared / 10 + 1;
-            paceTime = sf::seconds(0.5f - (static_cast<float>(player.playerGrid.totalLinesCleared / 10) * 0.08f));
         }
-    } // gameLoop()
+    }
+
+    void GameController::handlePlayerInput(int playerId, sf::Event &event, int &moveCount, bool &isTouchingGround)
+    {
+        Player &p = player[playerId];
+        int collision;
+
+        sf::Keyboard::Key downKey = (playerId == 0) ? sf::Keyboard::S : sf::Keyboard::Down;
+        sf::Keyboard::Key leftKey = (playerId == 0) ? sf::Keyboard::Q : sf::Keyboard::Left;
+        sf::Keyboard::Key rightKey = (playerId == 0) ? sf::Keyboard::D : sf::Keyboard::Right;
+        sf::Keyboard::Key rotateKey = (playerId == 0) ? sf::Keyboard::Z : sf::Keyboard::Up;
+
+        if (event.key.code == downKey)
+        {
+            collision = p.playerGrid.check_collision(
+                p.currentTetro, p.currentTetro.getShape(0),
+                p.currentTetro.position.x, p.currentTetro.position.y + 1);
+            if (collision == 0)
+            {
+                p.currentTetro.moveDown(1);
+                if (isTouchingGround)
+                {
+                    p.playerGrid.cancel_locking_timer();
+                    moveCount--;
+                }
+            }
+        }
+
+        if (event.key.code == leftKey)
+        {
+            collision = p.playerGrid.check_collision(
+                p.currentTetro, p.currentTetro.getShape(0),
+                p.currentTetro.position.x - 1, p.currentTetro.position.y);
+            if (collision != 1)
+            {
+                p.currentTetro.moveLeft();
+                if (isTouchingGround)
+                {
+                    p.playerGrid.cancel_locking_timer();
+                    moveCount--;
+                }
+            }
+        }
+
+        if (event.key.code == rightKey)
+        {
+            collision = p.playerGrid.check_collision(
+                p.currentTetro, p.currentTetro.getShape(0),
+                p.currentTetro.position.x + 1, p.currentTetro.position.y);
+            if (collision != 1)
+            {
+                p.currentTetro.moveRight();
+                if (isTouchingGround)
+                {
+                    p.playerGrid.cancel_locking_timer();
+                    moveCount--;
+                }
+            }
+        }
+
+        if (event.key.code == rotateKey)
+        {
+            auto newShape = p.currentTetro.getShape(1);
+            int currentRotation = p.currentTetro.currentRotation;
+            auto kick = p.playerGrid.try_wall_kicks(p.currentTetro, newShape, currentRotation);
+            collision = p.playerGrid.check_collision(
+                p.currentTetro, newShape,
+                p.currentTetro.position.x + kick.first,
+                p.currentTetro.position.y + kick.second);
+
+            if (collision == 0 || collision == 1)
+            {
+                p.currentTetro.rotate();
+                p.currentTetro.position.x += kick.first;
+                p.currentTetro.position.y += kick.second;
+                if (isTouchingGround)
+                {
+                    p.playerGrid.cancel_locking_timer();
+                    moveCount--;
+                }
+            }
+        }
+    }
 
     void GameController::setupScene()
     {
@@ -192,23 +247,35 @@ namespace game
             _window.draw(logo_sprite);
         }
 
-        player.playerGrid.drawGameGrid(_window, player.currentTetro, player.playerGrid.rows, player.playerGrid.columns);
-        player.playerGrid.drawNextGrid(_window, player.nextTetro);
-        player.drawDetails(_window, font);
-        player.playerGrid.drawGhostTetro(_window, player.currentTetro);
+        player[0].playerGrid.drawGameGrid(_window, player[0].currentTetro);
+        player[0].playerGrid.drawNextGrid(_window, player[0].nextTetro);
+        player[0].drawDetails(_window, font, modePLayed, 0);
+        player[0].playerGrid.drawGhostTetro(_window, player[0].currentTetro);
+
+        if (modePLayed == 2)
+        {
+            player[1].playerGrid.drawGameGrid(_window, player[1].currentTetro);
+            player[1].playerGrid.drawNextGrid(_window, player[1].nextTetro);
+            player[1].drawDetails(_window, font, modePLayed, 1);
+            player[1].playerGrid.drawGhostTetro(_window, player[1].currentTetro);
+        }
     }
 
     void GameController::gameOver()
     {
+        int finalScore = player[0].score;
+        int finalLevel = player[0].level;
         _game_music.stop();
         game::MainMenu menu(_window);
-        menu.showGameOverMenu();
+        menu.last_selected_mode = this->modePLayed;
+        menu.showGameOverMenu(finalScore, finalLevel);
     }
 
     void GameController::pause()
     {
         _game_music.pause();
         game::MainMenu menu(_window);
+        menu.last_selected_mode = this->modePLayed;
         menu.showPauseMenu(this);
         _game_music.play();
     }

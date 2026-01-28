@@ -1,0 +1,10 @@
+Tiagz 6900 4
+Bazaza 1800 12
+Max 1500 10
+Yeti 1200 8
+nathan 40 1
+oui 0 1
+yes 0 1
+Player 0 1
+ssssssqd 0 1
+fd 0 1

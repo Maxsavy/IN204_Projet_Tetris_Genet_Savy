@@ -5,8 +5,8 @@
 
 using namespace std;
 
-unsigned int windowWidth = 1280;
-unsigned int windowHeight = 720;
+unsigned int windowWidth = 1920;
+unsigned int windowHeight = 1080;
 
 int main()
 {
