@@ -2,4 +2,4 @@ Bazaza 1800 12
 Max 1500 10
 Yeti 1200 8
 nathan 40 1
-aure le sancho 40 1
+testtest 40 1

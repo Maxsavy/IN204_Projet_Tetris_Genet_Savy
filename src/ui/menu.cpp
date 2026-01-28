@@ -154,9 +154,6 @@ namespace game
             }
             nameText.setString(displayName);
 
-            sf::FloatRect textBounds = nameText.getLocalBounds();
-            nameText.setPosition(_window.getSize().x / 2.0f - textBounds.width / 2.0f, 420.0f);
-
             _window.clear();
             if (background.getSize().x > 0 && background.getSize().y > 0)
             {
@@ -171,11 +168,10 @@ namespace game
             _window.display();
         }
 
-        // Save to leaderboard
         if (!playerName.empty())
         {
             Leaderboard leaderboard;
-            leaderboard.addEntry("src/core/leaderboard.txt", playerName, finalScore, finalLevel);
+            leaderboard.addEntry("src/core/leaderboard.txt", playersName, finalScore, finalLevel);
         }
 
         // Return to main menu
