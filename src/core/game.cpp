@@ -210,6 +210,7 @@ namespace game
         _game_music.pause();
         game::MainMenu menu(_window);
         menu.showPauseMenu(this);
+        _game_music.play();
     }
 
     sf::RectangleShape getRectangleAt(sf::Vector2f location, sf::Color color)

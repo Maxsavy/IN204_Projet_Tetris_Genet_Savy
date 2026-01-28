@@ -133,7 +133,7 @@ namespace game
         {
             _background_music.setLoop(true);  // Active la boucle automatique
             _background_music.setVolume(50);   // Volume à 50% (optionnel)
-            _background_music.play();
+            _background_music.play();         // Démarre la lecture de la musique
         }
 
         game_menu::Style style{.TitleFont = &_font,
