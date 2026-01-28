@@ -24,7 +24,7 @@ Tetro::Tetro() : position(0, 0), currentRotation(0)
 {
     // Initialize the base class
 }
-
+// all theses functions create the different tetrominos with their colors from a shape based defined in pieces.hpp
 TetroI::TetroI() : Tetro()
 {
     color = sf::Color::Cyan;
@@ -74,6 +74,7 @@ TetroZ::TetroZ() : Tetro()
     initializeShape(Z_PIECE);
 }
 
+// basic movements for the tetrominos of the parent class Tetro reused by the children
 void Tetro::rotate()
 {
     currentRotation = (currentRotation + 1) % 4;
@@ -94,10 +95,9 @@ void Tetro::moveRight()
     position.x += 1;
 }
 
-
 const std::array<std::array<int, 4>, 4> &Tetro::getShape(int i) const
 {
-    return rotations[(currentRotation+i) % 4];
+    return rotations[(currentRotation + i) % 4];
 }
 
 void Tetro::setPosition(int gridX, int gridY)

@@ -2,6 +2,7 @@
 #include "tetros.hpp"
 #include <iostream>
 
+// function that updates any grid with any tetro in any state
 void Grid::update_with_tetro(const Tetro &tetro, int state)
 {
     for (int i = 0; i < rows * columns; i++)
@@ -45,6 +46,7 @@ void Grid::cancel_locking_timer()
     locking = false;
 }
 
+// function that handles the locking of a tetro into the grid
 bool Grid::locking_tetro(const Tetro &tetro, int move_count)
 {
 
@@ -65,6 +67,7 @@ bool Grid::locking_tetro(const Tetro &tetro, int move_count)
     return false;
 }
 
+// function that checks colision for a tetro with everything in the grid
 int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int futureY)
 {
     for (int i = 0; i < 4; i++)
@@ -76,55 +79,53 @@ int Grid::check_collision(const Tetro &tetro, const std::array<std::array<int, 4
                 int cibleX = futureX + j;
                 int cibleY = futureY + i;
 
-                // Check horizontal bounds
+                // check horizontal bounds (walls)
                 if (cibleX < 0 || cibleX >= columns)
                 {
-                    return 1; // Collision avec les murs
+                    return 1;
                 }
 
-                // Check vertical bounds
+                // check vertical bounds (floor/ceiling)
                 if (cibleY >= rows)
                 {
                     start_locking_timer();
-                    return 2; // Collision avec le sol
+                    return 2;
                 }
 
-                // Vérifier collision avec cellules déjà occupées
+                // check collision with locked pieces in the grid
                 int indx = cibleY * columns + cibleX;
                 if (cells[indx] != 0 && cells[indx] != 1)
                 {
-                    // Vérifier si c'est une collision latérale ou verticale
-                    // En comparant avec la position actuelle
-                    if (cibleY == tetro.position.y + i) // Même ligne verticale
+                    // check if it's a lateral or vertical collision by comparing with the current position
+                    if (cibleY == tetro.position.y + i)
                     {
-                        return 1; // Collision latérale
+                        return 1; // lateral collision
                     }
-                    else // Différente ligne verticale
+                    else
                     {
                         if (tetro.position.y < 2)
-                            return 3; // Collision avec le plafond
+                            return 3; // ceiling (game over)
                         start_locking_timer();
-                        return 2; // Collision par le bas
+                        return 2; // vertical collision (ground)
                     }
                 }
             }
         }
     }
-    return 0; // Pas de collision
+    return 0; // no collision
 }
 
 std::pair<int, int> Grid::try_wall_kicks(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &newShape, int currentRotation)
 {
-    // Positions de test standard pour le wall kick (SRS - Super Rotation System)
-    // Format: {offsetX, offsetY}
+    // test standard for the wall kick (SRS - Super Rotation System)
+    // format: {offsetX, offsetY}
     std::vector<std::pair<int, int>> kickTests;
 
-    // Pour les pièces I, utilisez un système différent
-    bool isIPiece = (tetro.colorRef == 2); // Supposant que I = colorRef 2
+    // for tetros I, different system
+    bool isIPiece = (tetro.colorRef == 2);
 
     if (isIPiece)
     {
-        // Wall kicks spéciaux pour la pièce I
         if (currentRotation == 0 || currentRotation == 2)
         {
             kickTests = {{0, 0}, {-2, 0}, {1, 0}, {-2, -1}, {1, 2}};
@@ -136,18 +137,18 @@ std::pair<int, int> Grid::try_wall_kicks(const Tetro &tetro, const std::array<st
     }
     else
     {
-        // Wall kicks standard pour J, L, S, T, Z
+        // wall kicks standards for J, L, S, T, Z
         kickTests = {
-            {0, 0},   // Pas de décalage (test normal)
-            {-1, 0},  // Décalage gauche
-            {1, 0},   // Décalage droite
-            {0, -1},  // Décalage haut
-            {-1, -1}, // Diagonale haut-gauche
-            {1, -1}   // Diagonale haut-droite
+            {0, 0},   // no wall kick
+            {-1, 0},  // left shift
+            {1, 0},   // right shift
+            {0, -1},  // up shift
+            {-1, -1}, // diagonal up-left
+            {1, -1}   // diagonal up-right
         };
     }
 
-    // Tester chaque position
+    // test every position
     for (const auto &kick : kickTests)
     {
         int testX = tetro.position.x + kick.first;
@@ -155,61 +156,17 @@ std::pair<int, int> Grid::try_wall_kicks(const Tetro &tetro, const std::array<st
 
         int collision = check_collision(tetro, newShape, testX, testY);
 
-        // Si pas de collision avec mur/pièce lockée (0 ou 2 acceptable si pas au sol)
+        // if no collision
         if (collision == 0)
         {
-            return kick; // Retourne le décalage qui fonctionne
+            return kick; // return good shift
         }
     }
 
-    return {0, 0}; // Aucun kick n'a fonctionné
+    return {0, 0}; // no working kick found
 }
 
-void Grid::update_with_ghost_tetro(const Tetro &tetro, int state)
-{
-    // Ne pas effacer les cellules 1 ici, car on veut afficher le ghost ET la pièce actuelle
-
-    const auto &shape = tetro.getShape(0); // Utiliser la rotation actuelle
-    Tetro ghostTetro = tetro;
-
-    // Descendre le ghost tetro jusqu'à collision
-    while (true)
-    {
-        int collision = check_collision(ghostTetro, shape, ghostTetro.position.x, ghostTetro.position.y + 1);
-        if (collision == 0)
-        {
-            ghostTetro.moveDown(1);
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    // Dessiner le ghost sur la grille
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            if (shape[i][j] == 1)
-            {
-                int gridX = ghostTetro.position.x + j;
-                int gridY = ghostTetro.position.y + i;
-
-                if (gridX >= 0 && gridX < columns && gridY >= 0 && gridY < rows)
-                {
-                    int idx = gridY * columns + gridX;
-                    // Ne dessiner le ghost que si la cellule est vide ou contient la pièce actuelle
-                    if (cells[idx] == 0 || cells[idx] == 1)
-                    {
-                        cells[idx] = state;
-                    }
-                }
-            }
-        }
-    }
-}
-
+// function that detects full rows, deletes them and moves everything down 1 row
 std::vector<int> Grid::delete_full_rows()
 {
     std::vector<int> fullRows;
@@ -230,7 +187,7 @@ std::vector<int> Grid::delete_full_rows()
             fullRows.push_back(i);
             linesCleared++;
             totalLinesCleared++;
-            // Move all rows above down by one
+            // move all rows above down by one
             for (int k = i; k > 0; k--)
             {
                 for (int j = 0; j < columns; j++)
@@ -238,7 +195,7 @@ std::vector<int> Grid::delete_full_rows()
                     cells[k * columns + j] = cells[(k - 1) * columns + j];
                 }
             }
-            // Clear the top row
+            // clear the top row
             for (int j = 0; j < columns; j++)
             {
                 cells[j] = 0;
@@ -248,6 +205,7 @@ std::vector<int> Grid::delete_full_rows()
     return fullRows;
 }
 
+// function that sets the position of the grid depending on the game mode and player id
 void Grid::setGridPosition(int mode, int pId, float windowWidth, float windowHeight)
 {
     gameMode = mode;
@@ -256,14 +214,16 @@ void Grid::setGridPosition(int mode, int pId, float windowWidth, float windowHei
     float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
     float gridWidth = static_cast<float>(columns) * pixelSize;
     float gridHeight = static_cast<float>(rows - 2) * pixelSize;
-
+    // solo mode
     if (mode == 1)
     {
         originX = (windowWidth - gridWidth) / 2.0f;
         originY = (windowHeight - gridHeight) / 2.0f;
     }
+    // multiplayer mode
     else if (mode == 2)
     {
+        // different positions for player 1 and player 2
         if (pId == 0)
         {
             originX = (windowWidth / 4.0f) - (gridWidth / 2.0f);
@@ -277,6 +237,7 @@ void Grid::setGridPosition(int mode, int pId, float windowWidth, float windowHei
     }
 }
 
+// function that draws the game grid
 void Grid::drawGameGrid(sf::RenderWindow &window, const Tetro &tetro)
 {
     this->update_with_tetro(tetro, 1);
@@ -286,11 +247,12 @@ void Grid::drawGameGrid(sf::RenderWindow &window, const Tetro &tetro)
     drawGrid(window, tetro, visibleRows, columns, originX, originY, pixelSize);
 }
 
+// function that draws the prediction grid of the next tetro
 void Grid::drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro)
 {
+    // calculates postion next to the main grid
     float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
     float gridWidth = static_cast<float>(columns) * pixelSize;
-
     float nextGridX = originX + gridWidth + 30.0f;
     float nextGridY = originY;
 
@@ -300,12 +262,15 @@ void Grid::drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro)
     nextTetro.setPosition(3, -1);
 }
 
+// main fucntion that draws any grid with any tetro
 void Grid::drawGrid(sf::RenderWindow &window, const Tetro &tetro, int rows, const int cols, float originX, float originY, float pixelSize)
 {
+    // create rectangle for each cell
     sf::RectangleShape cellShape(sf::Vector2f(pixelSize, pixelSize));
     cellShape.setOutlineThickness(1.f);
     cellShape.setOutlineColor(sf::Color(100, 100, 100));
 
+    /// draws the grid cell by cell changind the color depending on the values
     for (int i = 0; i < rows; ++i)
     {
         for (int j = 0; j < cols; ++j)
@@ -356,6 +321,7 @@ void Grid::drawGrid(sf::RenderWindow &window, const Tetro &tetro, int rows, cons
     }
 }
 
+// function that draws the ghost tetro at the bottom of the grid
 void Grid::drawGhostTetro(sf::RenderWindow &window, const Tetro &currentTetro)
 {
     int visibleRows = rows - 2;
@@ -408,6 +374,7 @@ void Grid::drawGhostTetro(sf::RenderWindow &window, const Tetro &currentTetro)
     }
 }
 
+// function that draws the animation when deleting full rows
 void Grid::draw_deleted_row_animation(sf::RenderWindow &window, const std::vector<int> &deletedRow)
 {
     float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
@@ -424,9 +391,8 @@ void Grid::draw_deleted_row_animation(sf::RenderWindow &window, const std::vecto
         {
             for (int row : deletedRow)
             {
-                // Effacer de l'intérieur vers l'extérieur
                 float xLeft = originX + j * pixelSize + step / 2.f;
-                float y = originY + (row - 2) * pixelSize; // -2 pour l'offset des lignes cachées
+                float y = originY + (row - 2) * pixelSize; // -2 for the offset of hidden rows
                 cellShape.setPosition(xLeft, y);
                 cellShape.setSize(sf::Vector2f(pixelSize - step, pixelSize));
                 cellShape.setFillColor(sf::Color::Black);

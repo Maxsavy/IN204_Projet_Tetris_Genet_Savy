@@ -4,7 +4,6 @@ Bazaza 1800 12
 Max 1500 10
 Yeti 1200 8
 oui 1100 2
-prout 300 1
+maxos 420 1
 nathan 40 1
-oui 0 1
-yes 0 1
+le 2 40

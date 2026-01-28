@@ -1,6 +1,7 @@
 #include <iostream>
 #include "player.hpp"
 
+// each player has a tetro that he controls, this function generates it randomly from the TETRO_BAG defined in pieces.hpp
 void Player::generateTetro(Tetro &tempTetro)
 {
     if (tetroList.empty())
@@ -50,6 +51,7 @@ int Player::hasMadeMove(sf::Event &event)
     return 0;
 }
 
+// function to draw the details : score, level and lines cleared of the player
 void Player::drawDetails(sf::RenderWindow &window, sf::Font &font, int modePlayed, int playerID)
 {
     float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
@@ -63,6 +65,7 @@ void Player::drawDetails(sf::RenderWindow &window, sf::Font &font, int modePlaye
     int linesSize = (modePlayed == 2) ? 30 : 35;
     float verticalSpacing = (modePlayed == 2) ? 50.f : 70.f;
 
+    // if 2 players, this shows P1 and P2
     if (modePlayed == 2)
     {
         sf::Text playerLabel;
@@ -74,6 +77,7 @@ void Player::drawDetails(sf::RenderWindow &window, sf::Font &font, int modePlaye
         window.draw(playerLabel);
     }
 
+    // all the texts to display the details
     sf::Text scoreText;
     scoreText.setFont(font);
     scoreText.setString("Score");
@@ -128,6 +132,7 @@ void Player::updateScore(int linesCleared)
     }
 }
 
+// initialization of the players
 void Player::initializeSinglePlayer()
 {
     generateTetro(currentTetro);
