@@ -41,7 +41,8 @@ public:
     void display_terminal() const;
     int check_collision(const Tetro &tetro, const std::array<std::array<int, 4>, 4> &shape, int futureX, int FutureY) const;
     void update_with_tetro(const Tetro &tetro, int state);
-    void delete_full_rows();
+    std::vector<int> delete_full_rows();
+    void draw_deleted_row_animation(sf::RenderWindow &window, const std::vector<int> &deletedRow);
     void drawGrid(sf::RenderWindow &window, const Tetro &currentTetro, const int rows, const int cols, float originX = 0.f, float originY = 0.f, float pixelSize = CELL_SIZE * RESIZE_FACTOR);
     void drawGameGrid(sf::RenderWindow &window, const Tetro &currentTetro, const int rows, const int cols);
     void drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro);

@@ -146,9 +146,12 @@ namespace game
                     gameOver();
                 }
             }
+            
             if (gameClock.getElapsedTime().asSeconds() >= 0.3f)
             {
-                player.playerGrid.delete_full_rows();
+                std::vector<int> deletedRows = player.playerGrid.delete_full_rows();
+                if (!deletedRows.empty())
+                    player.playerGrid.draw_deleted_row_animation(_window, deletedRows);
                 player.updateScore(player.playerGrid.linesCleared);
                 player.playerGrid.linesCleared = 0;
             }

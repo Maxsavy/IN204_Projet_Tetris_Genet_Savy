@@ -208,8 +208,9 @@ void Grid::update_with_ghost_tetro(const Tetro &tetro, int state)
     }
 }
 
-void Grid::delete_full_rows()
+std::vector<int> Grid::delete_full_rows()
 {
+    std::vector<int> fullRows;
     for (int i = 0; i < rows; i++)
     {
         bool isFull = true;
@@ -224,6 +225,7 @@ void Grid::delete_full_rows()
 
         if (isFull)
         {
+            fullRows.push_back(i);
             linesCleared++;
             totalLinesCleared++;
             // Move all rows above down by one
@@ -241,6 +243,7 @@ void Grid::delete_full_rows()
             }
         }
     }
+    return fullRows;
 }
 
 void Grid::drawNextGrid(sf::RenderWindow &window, Tetro &nextTetro)
@@ -387,5 +390,39 @@ void Grid::drawGhostTetro(sf::RenderWindow &window, const Tetro &currentTetro)
                 }
             }
         }
+    }
+}
+
+
+
+void Grid::draw_deleted_row_animation(sf::RenderWindow &window, const std::vector<int> &deletedRow)
+{
+    float pixelSize = static_cast<float>(CELL_SIZE * RESIZE_FACTOR);
+    float mainGridW = static_cast<float>(columns) * pixelSize;
+    float mainGridH = static_cast<float>(rows - 2) * pixelSize;
+    float mainOriginX = (static_cast<float>(window.getSize().x) - mainGridW) / 2.f;
+    float mainOriginY = (static_cast<float>(window.getSize().y) - mainGridH) / 2.f;
+
+    sf::RectangleShape cellShape(sf::Vector2f(pixelSize, pixelSize));
+    cellShape.setOutlineThickness(1.f);
+    cellShape.setOutlineColor(sf::Color(100, 100, 100));
+
+    for (int step = 0; step < static_cast<int>(pixelSize); step += 4)
+    {
+        for (int j = 0; j < columns; ++j)
+        {
+            for (int row : deletedRow)
+            {
+                // Effacer de l'intérieur vers l'extérieur
+                float xLeft = mainOriginX + j * pixelSize + step / 2.f;
+                float y = mainOriginY + (row - 1) * pixelSize; // -2 pour l'offset des lignes cachées
+                cellShape.setPosition(xLeft, y);
+                cellShape.setSize(sf::Vector2f(pixelSize - step, pixelSize));
+            cellShape.setFillColor(sf::Color::Black);
+            window.draw(cellShape);
+            }
+        }
+        window.display();
+        sf::sleep(sf::milliseconds(30));
     }
 }
