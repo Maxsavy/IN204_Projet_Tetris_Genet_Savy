@@ -12,6 +12,16 @@ namespace game
         score = 0;
         direction = {0, 0};
         scale = 1.0f;
+
+        if (!_game_music.openFromFile("assets/sounds/game_music.mp3"))
+        {
+            std::cerr << "Failed to load game music" << std::endl;
+        }
+        else
+        {
+            _game_music.setLoop(true);
+            _game_music.setVolume(40);
+        }
     }
 
     void GameController::start()
@@ -22,6 +32,7 @@ namespace game
         float originX = (static_cast<float>(_window.getSize().x) - targetW) / 2.f;
         float originY = (static_cast<float>(_window.getSize().y) - static_cast<float>(ROWS) * pixelSize) / 2.f;
 
+        _game_music.play();
         player.generateTetro(player.currentTetro);
         player.generateTetro(player.nextTetro);
         gameLoop();
@@ -46,6 +57,7 @@ namespace game
                 {
                     if (event.key.code == sf::Keyboard::Escape)
                     {
+                        _game_music.pause();
                         pause();
                     }
 
@@ -188,12 +200,14 @@ namespace game
 
     void GameController::gameOver()
     {
+        _game_music.stop();
         game::MainMenu menu(_window);
         menu.showGameOverMenu();
     }
 
     void GameController::pause()
     {
+        _game_music.pause();
         game::MainMenu menu(_window);
         menu.showPauseMenu(this);
     }

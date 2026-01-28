@@ -34,6 +34,19 @@ namespace game
                     _is_exit_requested = true;
                     break;
                 }
+
+                if (event.type == sf::Event::KeyPressed)
+                {
+                    if (event.key.code == sf::Keyboard::Z)
+                    {
+                        event.key.code = sf::Keyboard::Up;
+                    }
+                    else if (event.key.code == sf::Keyboard::S)
+                    {
+                        event.key.code = sf::Keyboard::Down;
+                    }
+                }
+
                 menu_handle_event(_current_menu, event);
             }
             _window.clear();
@@ -62,6 +75,19 @@ namespace game
                     _return_to_main_menu = true;
                     break;
                 }
+
+                if (event.type == sf::Event::KeyPressed)
+                {
+                    if (event.key.code == sf::Keyboard::Z)
+                    {
+                        event.key.code = sf::Keyboard::Up;
+                    }
+                    else if (event.key.code == sf::Keyboard::S)
+                    {
+                        event.key.code = sf::Keyboard::Down;
+                    }
+                }
+
                 menu_handle_event(_current_menu, event);
             }
             _window.clear();
@@ -98,6 +124,18 @@ namespace game
                 background_sprite.setPosition(0.f, 0.f);
             }
         }
+
+        if (!_background_music.openFromFile("assets/sounds/menu_theme.mp3"))
+        {
+            cerr << "Failed to load music file" << endl;
+        }
+        else
+        {
+            _background_music.setLoop(true);  // Active la boucle automatique
+            _background_music.setVolume(50);   // Volume à 50% (optionnel)
+            _background_music.play();
+        }
+
         game_menu::Style style{.TitleFont = &_font,
                                .ItemFont = &_font,
                                .TitleFontSize = 60,
@@ -124,7 +162,8 @@ namespace game
              [&](sf::RenderTarget &target)
              {
                  game::GameController gameController(_window);
-                 gameController.start();
+                 _background_music.stop();
+                 gameController.start();  
              }},
             {"Leaderboard", [](sf::RenderTarget &target)
              {
@@ -175,6 +214,7 @@ namespace game
              [&](sf::RenderTarget &target)
              {
                  game::GameController gameController(_window);
+                 _background_music.stop();
                  gameController.start();
              }},
             {"Return  to  Menu", [&](sf::RenderTarget &target)
@@ -226,6 +266,7 @@ namespace game
              {
                  _resume_game = false;
                  GameController gameController(_window);
+                 _background_music.stop();
                  gameController.start();
              }},
             {"Return  to  Menu", [&](sf::RenderTarget &target)
@@ -256,6 +297,19 @@ namespace game
                     _resume_game = true;
                     break;
                 }
+
+                if (event.type == sf::Event::KeyPressed)
+                {
+                    if (event.key.code == sf::Keyboard::Z)
+                    {
+                        event.key.code = sf::Keyboard::Up;
+                    }
+                    else if (event.key.code == sf::Keyboard::S)
+                    {
+                        event.key.code = sf::Keyboard::Down;
+                    }
+                }
+
                 menu_handle_event(_current_menu, event);
             }
             _window.clear();

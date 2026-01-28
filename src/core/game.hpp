@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
+#include <SFML/Audio.hpp>
 #include "player.hpp"
 #include <list>
 #include <random>
@@ -64,6 +65,7 @@ namespace game
         sf::Sprite background_sprite;
         sf::Sprite grid_sprite;
         sf::Sprite logo_sprite;
+        sf::Music _game_music;
         sf::RenderWindow &_window;
         sf::Vector2i direction;
         sf::Font font;
