@@ -22,7 +22,7 @@ void Tetro::initializeShape(const int (&piece)[4][4][4])
 
 Tetro::Tetro() : position(0, 0), currentRotation(0)
 {
-    // base constructor does not initialize a specific piece
+    // Initialize the base class
 }
 
 TetroI::TetroI() : Tetro()

@@ -3,6 +3,7 @@
 
 #include <array>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 enum class TetroType
 {

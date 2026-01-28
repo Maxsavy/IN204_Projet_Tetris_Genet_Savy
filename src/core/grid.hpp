@@ -5,6 +5,8 @@
 #include "tetros.hpp"
 #include "pieces.hpp"
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <iostream>
 
 constexpr int ROWS = 20;
 constexpr int COLUMNS = 10;
@@ -29,6 +31,8 @@ public:
     int playerId = 0;
     int gameMode = 1;
     std::vector<int> cells;
+    sf::Music lineClearSound;
+    sf::Music lockSound;
 
     Grid() : rows(22), columns(10), cellSize(8)
     {
@@ -39,6 +43,24 @@ public:
             {
                 cells[i * columns + j] = 0;
             }
+        }
+
+        if (!lineClearSound.openFromFile("assets/sounds/clear_line.mp3"))
+        {
+            std::cerr << "Failed to load line clear sound file" << std::endl;
+        }
+        else
+        {
+            lineClearSound.setVolume(80);
+        }
+
+        if (!lockSound.openFromFile("assets/sounds/lock.mp3"))
+        {
+            std::cerr << "Failed to load lock sound file" << std::endl;
+        }
+        else
+        {
+            lockSound.setVolume(80);
         }
     }
 

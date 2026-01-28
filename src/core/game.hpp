@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
+#include <SFML/Audio.hpp>
 #include "player.hpp"
 #include <list>
 #include <random>
@@ -46,6 +47,7 @@ namespace game
         GameController(sf::RenderWindow &w);
         Player player[2];
         sf::Clock gameClock;
+        int modePLayed;
         void gameLoop();
         void start(int mode);
 
@@ -65,17 +67,17 @@ namespace game
         sf::Sprite background_sprite;
         sf::Sprite grid_sprite;
         sf::Sprite logo_sprite;
+        sf::Music _game_music;
         sf::RenderWindow &_window;
         sf::Vector2i direction;
         sf::Font font;
         sf::Text scoreText;
         float scale;
         int score;
-        int modePLayed;
         bool isPaused = false;
 
     }; // class game
 
-} // namespace game
+}; // namespace game
 
 #endif // GAME_HPP

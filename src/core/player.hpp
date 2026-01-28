@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include "grid.hpp"
 #include "tetros.hpp"
+#include <SFML/Audio.hpp>
+#include <iostream>
 
 class Player
 {
@@ -19,10 +21,19 @@ public:
     Grid playerGrid;
     Grid nextTetroGrid;
     int level = 1;
+    sf::Music moveSound;
     // Constructeurs et méthodes
 
     Player() : score(0), name("Player"), id(0)
     {
+        if (!moveSound.openFromFile("assets/sounds/move_rotation.mp3"))
+        {
+            std::cerr << "Failed to load music file" << std::endl;
+        }
+        else
+        {
+            moveSound.setVolume(100);
+        }
     }
 
     ~Player() {}

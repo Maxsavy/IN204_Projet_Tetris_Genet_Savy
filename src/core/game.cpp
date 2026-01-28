@@ -12,6 +12,16 @@ namespace game
         score = 0;
         direction = {0, 0};
         scale = 1.0f;
+
+        if (!_game_music.openFromFile("assets/sounds/game_music.mp3"))
+        {
+            std::cerr << "Failed to load game music" << std::endl;
+        }
+        else
+        {
+            _game_music.setLoop(true);
+            _game_music.setVolume(30);
+        }
     }
 
     void GameController::start(int mode)
@@ -33,6 +43,7 @@ namespace game
             player[1].initializeSplitScreenPlayer(1);
             player[1].playerGrid.setGridPosition(2, 1, windowW, windowH);
         }
+        _game_music.play();
 
         gameLoop();
     }
@@ -63,6 +74,7 @@ namespace game
                 {
                     if (event.key.code == sf::Keyboard::Escape)
                     {
+                        _game_music.pause();
                         pause();
                     }
 
@@ -141,13 +153,11 @@ namespace game
         Player &p = player[playerId];
         int collision;
 
-        // Define controls based on player
         sf::Keyboard::Key downKey = (playerId == 0) ? sf::Keyboard::S : sf::Keyboard::Down;
         sf::Keyboard::Key leftKey = (playerId == 0) ? sf::Keyboard::Q : sf::Keyboard::Left;
         sf::Keyboard::Key rightKey = (playerId == 0) ? sf::Keyboard::D : sf::Keyboard::Right;
         sf::Keyboard::Key rotateKey = (playerId == 0) ? sf::Keyboard::Z : sf::Keyboard::Up;
 
-        // Move down
         if (event.key.code == downKey)
         {
             collision = p.playerGrid.check_collision(
@@ -156,6 +166,7 @@ namespace game
             if (collision == 0)
             {
                 p.currentTetro.moveDown(1);
+                p.moveSound.play();
                 if (isTouchingGround)
                 {
                     p.playerGrid.cancel_locking_timer();
@@ -164,7 +175,6 @@ namespace game
             }
         }
 
-        // Move left
         if (event.key.code == leftKey)
         {
             collision = p.playerGrid.check_collision(
@@ -173,6 +183,7 @@ namespace game
             if (collision != 1)
             {
                 p.currentTetro.moveLeft();
+                p.moveSound.play();
                 if (isTouchingGround)
                 {
                     p.playerGrid.cancel_locking_timer();
@@ -181,7 +192,6 @@ namespace game
             }
         }
 
-        // Move right
         if (event.key.code == rightKey)
         {
             collision = p.playerGrid.check_collision(
@@ -190,6 +200,7 @@ namespace game
             if (collision != 1)
             {
                 p.currentTetro.moveRight();
+                p.moveSound.play();
                 if (isTouchingGround)
                 {
                     p.playerGrid.cancel_locking_timer();
@@ -198,7 +209,6 @@ namespace game
             }
         }
 
-        // Rotate
         if (event.key.code == rotateKey)
         {
             auto newShape = p.currentTetro.getShape(1);
@@ -212,6 +222,7 @@ namespace game
             if (collision == 0 || collision == 1)
             {
                 p.currentTetro.rotate();
+                p.moveSound.play();
                 p.currentTetro.position.x += kick.first;
                 p.currentTetro.position.y += kick.second;
                 if (isTouchingGround)
@@ -256,14 +267,21 @@ namespace game
 
     void GameController::gameOver()
     {
+        int finalScore = player[0].score;
+        int finalLevel = player[0].level;
+        _game_music.stop();
         game::MainMenu menu(_window);
-        menu.showGameOverMenu();
+        menu.last_selected_mode = this->modePLayed;
+        menu.showGameOverMenu(finalScore, finalLevel);
     }
 
     void GameController::pause()
     {
+        _game_music.pause();
         game::MainMenu menu(_window);
+        menu.last_selected_mode = this->modePLayed;
         menu.showPauseMenu(this);
+        _game_music.play();
     }
 
     sf::RectangleShape getRectangleAt(sf::Vector2f location, sf::Color color)

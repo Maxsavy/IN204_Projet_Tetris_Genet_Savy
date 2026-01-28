@@ -1,5 +1,6 @@
 #include "menu.hpp"
 #include "../core/game.hpp"
+#include "../core/leaderboard.hpp"
 #include <iostream>
 using namespace std;
 
@@ -34,6 +35,30 @@ namespace game
                     _is_exit_requested = true;
                     break;
                 }
+
+                if (event.type == sf::Event::KeyPressed)
+                {
+
+                    if (event.key.code == sf::Keyboard::Z || 
+                    event.key.code == sf::Keyboard::S ||
+                    event.key.code == sf::Keyboard::Up ||
+                    event.key.code == sf::Keyboard::Down)
+                    {
+                        _select_sound.play();  
+                    }
+
+                    if (event.key.code == sf::Keyboard::Z)
+                    {
+
+                        event.key.code = sf::Keyboard::Up;
+                    }
+                    else if (event.key.code == sf::Keyboard::S)
+                    {
+
+                        event.key.code = sf::Keyboard::Down;
+                    }
+                }
+
                 menu_handle_event(_current_menu, event);
             }
             _window.clear();
@@ -46,32 +71,135 @@ namespace game
         }
     }
 
-    void MainMenu::showGameOverMenu()
+    void MainMenu::showGameOverMenu(int finalScore, int finalLevel)
     {
         _return_to_main_menu = false;
-        _current_menu = _game_over_menu_context.get();
         _window.setFramerateLimit(144);
-        while (_window.isOpen() && !_return_to_main_menu)
+
+        std::string playerName = "";
+        bool enteringName = true;
+        const int maxNameLength = 15;
+
+        sf::Font font;
+        if (!font.loadFromFile("assets/fonts/arcade.ttf"))
+        {
+            std::cerr << "Failed to load font" << std::endl;
+            return;
+        }
+
+        sf::Text titleText;
+        titleText.setFont(font);
+        titleText.setString("GAME OVER");
+        titleText.setCharacterSize(60);
+        titleText.setFillColor(sf::Color::White);
+        titleText.setPosition(_window.getSize().x / 2.0f - 180.0f, 100.0f);
+
+        sf::Text scoreText;
+        scoreText.setFont(font);
+        scoreText.setString("Score  " + std::to_string(finalScore));
+        scoreText.setCharacterSize(40);
+        scoreText.setFillColor(sf::Color::Cyan);
+        scoreText.setPosition(_window.getSize().x / 2.0f - 150.0f, 200.0f);
+
+        sf::Text levelText;
+        levelText.setFont(font);
+        levelText.setString("Level  " + std::to_string(finalLevel));
+        levelText.setCharacterSize(40);
+        levelText.setFillColor(sf::Color::Cyan);
+        levelText.setPosition(_window.getSize().x / 2.0f - 150.0f, 260.0f);
+
+        sf::Text promptText;
+        promptText.setFont(font);
+        promptText.setString("Enter your name");
+        promptText.setCharacterSize(35);
+        promptText.setFillColor(sf::Color::White);
+        promptText.setPosition(_window.getSize().x / 2.0f - 180.0f, 350.0f);
+
+        sf::Text nameText;
+        nameText.setFont(font);
+        nameText.setString("_");
+        nameText.setCharacterSize(45);
+        nameText.setFillColor(sf::Color::Yellow);
+        nameText.setPosition(_window.getSize().x / 2.0f - 100.0f, 420.0f);
+
+        sf::Text instructionText;
+        instructionText.setFont(font);
+        instructionText.setString("Press ENTER to continue");
+        instructionText.setCharacterSize(25);
+        instructionText.setFillColor(sf::Color(200, 200, 200));
+        instructionText.setPosition(_window.getSize().x / 2.0f - 200.0f, 520.0f);
+
+        sf::Clock blinkClock;
+        bool showCursor = true;
+
+        while (_window.isOpen() && enteringName)
         {
             sf::Event event;
             while (_window.pollEvent(event))
             {
-                if (event.type == sf::Event::Closed ||
-                    (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+                if (event.type == sf::Event::Closed)
                 {
-                    _return_to_main_menu = true;
-                    break;
+                    _window.close();
+                    return;
                 }
-                menu_handle_event(_current_menu, event);
+
+                if (event.type == sf::Event::TextEntered)
+                {
+                    if (event.text.unicode == '\b' && playerName.length() > 0)
+                    {
+                        playerName.pop_back();
+                    }
+                    else if (event.text.unicode == '\r' || event.text.unicode == '\n')
+                    {
+                        if (playerName.empty())
+                        {
+                            playerName = "Player";
+                        }
+                        enteringName = false;
+                    }
+                    else if (event.text.unicode < 128 && event.text.unicode >= 32 &&
+                             playerName.length() < maxNameLength)
+                    {
+                        playerName += static_cast<char>(event.text.unicode);
+                    }
+                }
             }
+
+            if (blinkClock.getElapsedTime().asSeconds() >= 0.5f)
+            {
+                showCursor = !showCursor;
+                blinkClock.restart();
+            }
+
+            std::string displayName = playerName;
+            if (showCursor && enteringName)
+            {
+                displayName += "_";
+            }
+            nameText.setString(displayName);
+
             _window.clear();
             if (background.getSize().x > 0 && background.getSize().y > 0)
             {
                 _window.draw(background_sprite);
             }
-            menu_render(_current_menu);
+            _window.draw(titleText);
+            _window.draw(scoreText);
+            _window.draw(levelText);
+            _window.draw(promptText);
+            _window.draw(nameText);
+            _window.draw(instructionText);
             _window.display();
         }
+
+        if (!playerName.empty())
+        {
+            Leaderboard leaderboard;
+            leaderboard.addEntry("src/core/leaderboard.txt", playerName, finalScore, finalLevel);
+        }
+
+        // Return to main menu
+        _return_to_main_menu = true;
         _current_menu = _main_menu_context.get();
     }
 
@@ -98,6 +226,28 @@ namespace game
                 background_sprite.setPosition(0.f, 0.f);
             }
         }
+
+        if (!_background_music.openFromFile("assets/sounds/menu_theme.mp3"))
+        {
+            cerr << "Failed to load music file" << endl;
+        }
+        else
+        {
+            _background_music.setLoop(true);  // Active la boucle automatique
+            _background_music.setVolume(30);   // Volume à 30% (optionnel)
+            _background_music.play();         // Démarre la lecture de la musique
+        }
+
+        if (!_select_sound.openFromFile("assets/sounds/button_sound.mp3"))
+        {
+            cerr << "Failed to load select sound file" << endl;
+        }
+        else
+        {
+            _select_sound.setVolume(100);   // Volume à 100% (optionnel)
+        }
+
+
         game_menu::Style style{.TitleFont = &_font,
                                .ItemFont = &_font,
                                .TitleFontSize = 60,
@@ -123,20 +273,25 @@ namespace game
             {"New  Solo  Game",
              [&](sf::RenderTarget &target)
              {
+                last_selected_mode = 1;
                  game::GameController gameController(_window);
-                 last_selected_mode = 1;
-                 gameController.start(1);
+                 std::cout << "Starting solo game with mode " << last_selected_mode << std::endl;
+                 _background_music.stop();
+                 gameController.start(last_selected_mode);
              }},
             {"New  Split Screen Game",
              [&](sf::RenderTarget &target)
              {
+                last_selected_mode = 2;
                  game::GameController gameController(_window);
-                 last_selected_mode = 2;
-                 gameController.start(2);
+                 std::cout << "Starting split screen game with mode " << last_selected_mode << std::endl;
+                 _background_music.stop();
+                 gameController.start(last_selected_mode);
              }},
             {"Leaderboard", [](sf::RenderTarget &target)
              {
-                 cout << "leaderboard!" << endl;
+                 Leaderboard leaderboard;
+                 leaderboard.start(static_cast<sf::RenderWindow &>(target));
              }},
             {"Settings", [](sf::RenderTarget &target)
              {
@@ -153,6 +308,56 @@ namespace game
         _current_menu = _main_menu_context.get();
 
         setup_game_over_menu();
+        setup_pause_menu();
+    }
+
+    void MainMenu::setup_pause_menu()
+    {
+        game_menu::Style style{.TitleFont = &_font,
+                            .ItemFont = &_font,
+                            .TitleFontSize = 60,
+                            .ItemFontSize = 35,
+                            .MenuTitleScaleFactor = 1,
+                            .MenuItemScaleFactor = 1.5,
+                            .colorScheme = {.titleColor = 0xFFFFFF,
+                                            .itemColor = 0xFFFFFF,
+                                            .selectedColor = 0xFF22F1},
+                            .PaddingTitle =
+                                {
+                                    .top = 100,
+                                    .left = 0,
+                                },
+                            .PaddingItems =
+                                {
+                                    .top = 30,
+                                },
+                            .TitleAlign = game_menu::Align::Center,
+                            .ItemAlign = game_menu::Align::Center};
+
+        std::vector<game_menu::MenuItem> items{
+            {"Resume",
+            [&](sf::RenderTarget &target)
+            {
+                _resume_game = true;
+            }},
+            {"Replay",
+            [&](sf::RenderTarget &target)
+            {
+                _resume_game = false;
+                std::cout << "DEBUG: Replaying with mode " << last_selected_mode << std::endl;
+                GameController gameController(_window);
+                gameController.start(last_selected_mode);
+            }},
+            {"Return  to  Menu", [&](sf::RenderTarget &target)
+            {
+                _return_to_main_menu = true;
+                _current_menu = _main_menu_context.get();
+            }}};
+
+        game_menu::MenuConfig config{
+            .title = " PAUSE", .items = items, .style = style};
+
+        _pause_menu_context.reset(create_menu_context(_window, config));
     }
 
     void MainMenu::setup_game_over_menu()
@@ -183,7 +388,8 @@ namespace game
              [&](sf::RenderTarget &target)
              {
                  game::GameController gameController(_window);
-                 gameController.start(last_selected_mode);
+                 _background_music.stop();
+                gameController.start(last_selected_mode);
              }},
             {"Return  to  Menu", [&](sf::RenderTarget &target)
              {
@@ -202,50 +408,6 @@ namespace game
         _return_to_main_menu = false;
         _resume_game = false;
 
-        game_menu::Style style{.TitleFont = &_font,
-                               .ItemFont = &_font,
-                               .TitleFontSize = 60,
-                               .ItemFontSize = 35,
-                               .MenuTitleScaleFactor = 1,
-                               .MenuItemScaleFactor = 1.5,
-                               .colorScheme = {.titleColor = 0xFFFFFF,
-                                               .itemColor = 0xFFFFFF,
-                                               .selectedColor = 0xFF22F1},
-                               .PaddingTitle =
-                                   {
-                                       .top = 100,
-                                       .left = 0,
-                                   },
-                               .PaddingItems =
-                                   {
-                                       .top = 30,
-                                   },
-                               .TitleAlign = game_menu::Align::Center,
-                               .ItemAlign = game_menu::Align::Center};
-
-        std::vector<game_menu::MenuItem> items{
-            {"Resume",
-             [&](sf::RenderTarget &target)
-             {
-                 _resume_game = true;
-             }},
-            {"Replay",
-             [&](sf::RenderTarget &target)
-             {
-                 _resume_game = false;
-                 GameController gameController(_window);
-                 gameController.start(last_selected_mode);
-             }},
-            {"Return  to  Menu", [&](sf::RenderTarget &target)
-             {
-                 _return_to_main_menu = true;
-                 _current_menu = _main_menu_context.get();
-             }}};
-
-        game_menu::MenuConfig config{
-            .title = " PAUSE", .items = items, .style = style};
-
-        _pause_menu_context.reset(create_menu_context(_window, config));
         _current_menu = _pause_menu_context.get();
 
         _window.setFramerateLimit(144);
@@ -264,6 +426,27 @@ namespace game
                     _resume_game = true;
                     break;
                 }
+
+                if (event.type == sf::Event::KeyPressed)
+                {
+                    if (event.key.code == sf::Keyboard::Z || 
+                    event.key.code == sf::Keyboard::S ||
+                    event.key.code == sf::Keyboard::Up ||
+                    event.key.code == sf::Keyboard::Down)
+                    {
+                        _select_sound.play();  
+                    }
+                    
+                    if (event.key.code == sf::Keyboard::Z)
+                    {
+                        event.key.code = sf::Keyboard::Up;
+                    }
+                    else if (event.key.code == sf::Keyboard::S)
+                    {
+                        event.key.code = sf::Keyboard::Down;
+                    }
+                }
+
                 menu_handle_event(_current_menu, event);
             }
             _window.clear();

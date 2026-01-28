@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <game_menu/game_menu.h>
 #include "../core/game.hpp"
 #include <memory>
@@ -11,17 +12,23 @@ namespace game
     class MainMenu
     {
     public:
+        int last_selected_mode = 2;
+
         MainMenu(sf::RenderWindow &w);
         void start();
-        void showGameOverMenu();
+        void showGameOverMenu(int finalScore = 0, int finalLevel = 1);
         void showPauseMenu(GameController *gameController);
+        void setup_menu_context();
 
     private:
-        void setup_menu_context();
+        
         void setup_game_over_menu();
+        void setup_pause_menu();
 
         sf::RenderWindow &_window;
         sf::Font _font;
+        sf::Music _background_music;
+        sf::Music _select_sound;
         game_menu::MENU *_current_menu;
         std::unique_ptr<game_menu::MENU, std::function<void(game_menu::MENU *)>>
             _main_menu_context;
@@ -32,6 +39,6 @@ namespace game
         bool _is_exit_requested = false;
         bool _return_to_main_menu = false;
         bool _resume_game = false;
-        int last_selected_mode;
+        
     };
 } // namespace game
