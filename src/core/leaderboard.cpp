@@ -5,6 +5,7 @@
 #include <vector>
 #include "leaderboard.hpp"
 
+// load the data from leaderboard.txt and return a vector of LeaderboardEntry structs
 std::vector<LeaderboardEntry> Leaderboard::loadLeaderboard(const std::string &filename)
 {
     std::vector<LeaderboardEntry> entries;
@@ -39,7 +40,7 @@ std::vector<LeaderboardEntry> Leaderboard::loadLeaderboard(const std::string &fi
     file.close();
     return entries;
 }
-
+// function to access the leaderboard page with the best 10 scores
 void Leaderboard::start(sf::RenderWindow &window)
 {
     sf::Font font;
@@ -66,6 +67,7 @@ void Leaderboard::start(sf::RenderWindow &window)
 
     std::vector<LeaderboardEntry> entries = loadLeaderboard("src/core/leaderboard.txt");
 
+    // different texts displays
     sf::Text title;
     title.setFont(font);
     title.setString("LEADERBOARD");
@@ -111,6 +113,7 @@ void Leaderboard::start(sf::RenderWindow &window)
 
     window.setFramerateLimit(60);
 
+    // the page loop
     while (window.isOpen())
     {
         sf::Event event;
@@ -143,7 +146,7 @@ void Leaderboard::start(sf::RenderWindow &window)
         window.draw(headerLevel);
 
         float entryY = startY + 60.0f;
-        int maxEntries = std::min(static_cast<int>(entries.size()), 10); // Show top 10
+        int maxEntries = std::min(static_cast<int>(entries.size()), 10); // show top 10
 
         for (int i = 0; i < maxEntries; i++)
         {
@@ -163,6 +166,7 @@ void Leaderboard::start(sf::RenderWindow &window)
             score.setCharacterSize(30);
             level.setCharacterSize(30);
 
+            // different colors for the top3
             sf::Color entryColor = sf::Color::White;
             if (i == 0)
                 entryColor = sf::Color(255, 215, 0);
@@ -195,6 +199,7 @@ void Leaderboard::start(sf::RenderWindow &window)
     }
 }
 
+// function to create a new entry to save in the leaderboard
 void Leaderboard::addEntry(const std::string &filename, const std::string &name, int score, int level)
 {
     std::vector<LeaderboardEntry> entries = loadLeaderboard(filename);
@@ -219,6 +224,7 @@ void Leaderboard::addEntry(const std::string &filename, const std::string &name,
     saveLeaderboard(filename, entries);
 }
 
+// function to save a new entry into leaderboard.txt
 void Leaderboard::saveLeaderboard(const std::string &filename, const std::vector<LeaderboardEntry> &entries)
 {
     std::ofstream file(filename);

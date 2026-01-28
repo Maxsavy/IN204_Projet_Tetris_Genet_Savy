@@ -15,6 +15,7 @@ namespace game
         setup_menu_context();
     }
 
+    // function to setup and start the main menu
     void MainMenu::start()
     {
         _window.setFramerateLimit(144);
@@ -29,6 +30,7 @@ namespace game
             sf::Event event;
             while (_window.pollEvent(event))
             {
+                // keys to move for actions
                 if (event.type == sf::Event::Closed ||
                     (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
                 {
@@ -39,12 +41,12 @@ namespace game
                 if (event.type == sf::Event::KeyPressed)
                 {
 
-                    if (event.key.code == sf::Keyboard::Z || 
-                    event.key.code == sf::Keyboard::S ||
-                    event.key.code == sf::Keyboard::Up ||
-                    event.key.code == sf::Keyboard::Down)
+                    if (event.key.code == sf::Keyboard::Z ||
+                        event.key.code == sf::Keyboard::S ||
+                        event.key.code == sf::Keyboard::Up ||
+                        event.key.code == sf::Keyboard::Down)
                     {
-                        _select_sound.play();  
+                        _select_sound.play();
                     }
 
                     if (event.key.code == sf::Keyboard::Z)
@@ -71,6 +73,7 @@ namespace game
         }
     }
 
+    // function to setup and start the game over menu
     void MainMenu::showGameOverMenu(int finalScore, int finalLevel)
     {
         _return_to_main_menu = false;
@@ -87,6 +90,7 @@ namespace game
             return;
         }
 
+        // different texts to display
         sf::Text titleText;
         titleText.setFont(font);
         titleText.setString("GAME OVER");
@@ -129,6 +133,7 @@ namespace game
         instructionText.setFillColor(sf::Color(200, 200, 200));
         instructionText.setPosition(_window.getSize().x / 2.0f - 200.0f, 520.0f);
 
+        // system for the name input with blinking cursor
         sf::Clock blinkClock;
         bool showCursor = true;
 
@@ -192,17 +197,19 @@ namespace game
             _window.display();
         }
 
+        // save in the leaderboard
         if (!playerName.empty())
         {
             Leaderboard leaderboard;
             leaderboard.addEntry("src/core/leaderboard.txt", playerName, finalScore, finalLevel);
         }
 
-        // Return to main menu
+        // return to main menu
         _return_to_main_menu = true;
         _current_menu = _main_menu_context.get();
     }
 
+    // function to setup the main menu
     void MainMenu::setup_menu_context()
     {
         if (!_font.loadFromFile("assets/fonts/arcade.ttf"))
@@ -233,9 +240,9 @@ namespace game
         }
         else
         {
-            _background_music.setLoop(true);  // Active la boucle automatique
-            _background_music.setVolume(30);   // Volume à 30% (optionnel)
-            _background_music.play();         // Démarre la lecture de la musique
+            _background_music.setLoop(true); // Active la boucle automatique
+            _background_music.setVolume(30); // Volume à 30% (optionnel)
+            _background_music.play();        // Démarre la lecture de la musique
         }
 
         if (!_select_sound.openFromFile("assets/sounds/button_sound.mp3"))
@@ -244,9 +251,8 @@ namespace game
         }
         else
         {
-            _select_sound.setVolume(100);   // Volume à 100% (optionnel)
+            _select_sound.setVolume(100); // Volume à 100% (optionnel)
         }
-
 
         game_menu::Style style{.TitleFont = &_font,
                                .ItemFont = &_font,
@@ -269,11 +275,12 @@ namespace game
                                .TitleAlign = game_menu::Align::Center,
                                .ItemAlign = game_menu::Align::Center};
 
+        // different buttons and what they do
         std::vector<game_menu::MenuItem> items{
             {"New  Solo  Game",
              [&](sf::RenderTarget &target)
              {
-                last_selected_mode = 1;
+                 last_selected_mode = 1;
                  game::GameController gameController(_window);
                  std::cout << "Starting solo game with mode " << last_selected_mode << std::endl;
                  _background_music.stop();
@@ -282,7 +289,7 @@ namespace game
             {"New  Split Screen Game",
              [&](sf::RenderTarget &target)
              {
-                last_selected_mode = 2;
+                 last_selected_mode = 2;
                  game::GameController gameController(_window);
                  std::cout << "Starting split screen game with mode " << last_selected_mode << std::endl;
                  _background_music.stop();
@@ -292,10 +299,6 @@ namespace game
              {
                  Leaderboard leaderboard;
                  leaderboard.start(static_cast<sf::RenderWindow &>(target));
-             }},
-            {"Settings", [](sf::RenderTarget &target)
-             {
-                 cout << "settings!" << endl;
              }},
             {"Exit", [&](sf::RenderTarget &target)
              { this->_is_exit_requested = true; 
@@ -311,48 +314,49 @@ namespace game
         setup_pause_menu();
     }
 
+    // function to setup the pause menu
     void MainMenu::setup_pause_menu()
     {
         game_menu::Style style{.TitleFont = &_font,
-                            .ItemFont = &_font,
-                            .TitleFontSize = 60,
-                            .ItemFontSize = 35,
-                            .MenuTitleScaleFactor = 1,
-                            .MenuItemScaleFactor = 1.5,
-                            .colorScheme = {.titleColor = 0xFFFFFF,
-                                            .itemColor = 0xFFFFFF,
-                                            .selectedColor = 0xFF22F1},
-                            .PaddingTitle =
-                                {
-                                    .top = 100,
-                                    .left = 0,
-                                },
-                            .PaddingItems =
-                                {
-                                    .top = 30,
-                                },
-                            .TitleAlign = game_menu::Align::Center,
-                            .ItemAlign = game_menu::Align::Center};
+                               .ItemFont = &_font,
+                               .TitleFontSize = 60,
+                               .ItemFontSize = 35,
+                               .MenuTitleScaleFactor = 1,
+                               .MenuItemScaleFactor = 1.5,
+                               .colorScheme = {.titleColor = 0xFFFFFF,
+                                               .itemColor = 0xFFFFFF,
+                                               .selectedColor = 0xFF22F1},
+                               .PaddingTitle =
+                                   {
+                                       .top = 100,
+                                       .left = 0,
+                                   },
+                               .PaddingItems =
+                                   {
+                                       .top = 30,
+                                   },
+                               .TitleAlign = game_menu::Align::Center,
+                               .ItemAlign = game_menu::Align::Center};
 
         std::vector<game_menu::MenuItem> items{
             {"Resume",
-            [&](sf::RenderTarget &target)
-            {
-                _resume_game = true;
-            }},
+             [&](sf::RenderTarget &target)
+             {
+                 _resume_game = true;
+             }},
             {"Replay",
-            [&](sf::RenderTarget &target)
-            {
-                _resume_game = false;
-                std::cout << "DEBUG: Replaying with mode " << last_selected_mode << std::endl;
-                GameController gameController(_window);
-                gameController.start(last_selected_mode);
-            }},
+             [&](sf::RenderTarget &target)
+             {
+                 _resume_game = false;
+                 std::cout << "DEBUG: Replaying with mode " << last_selected_mode << std::endl;
+                 GameController gameController(_window);
+                 gameController.start(last_selected_mode);
+             }},
             {"Return  to  Menu", [&](sf::RenderTarget &target)
-            {
-                _return_to_main_menu = true;
-                _current_menu = _main_menu_context.get();
-            }}};
+             {
+                 _return_to_main_menu = true;
+                 _current_menu = _main_menu_context.get();
+             }}};
 
         game_menu::MenuConfig config{
             .title = " PAUSE", .items = items, .style = style};
@@ -389,7 +393,7 @@ namespace game
              {
                  game::GameController gameController(_window);
                  _background_music.stop();
-                gameController.start(last_selected_mode);
+                 gameController.start(last_selected_mode);
              }},
             {"Return  to  Menu", [&](sf::RenderTarget &target)
              {
@@ -403,6 +407,7 @@ namespace game
         _game_over_menu_context.reset(create_menu_context(_window, config));
     }
 
+    // function to setup and start the pause menu
     void MainMenu::showPauseMenu(GameController *gameController)
     {
         _return_to_main_menu = false;
@@ -429,14 +434,14 @@ namespace game
 
                 if (event.type == sf::Event::KeyPressed)
                 {
-                    if (event.key.code == sf::Keyboard::Z || 
-                    event.key.code == sf::Keyboard::S ||
-                    event.key.code == sf::Keyboard::Up ||
-                    event.key.code == sf::Keyboard::Down)
+                    if (event.key.code == sf::Keyboard::Z ||
+                        event.key.code == sf::Keyboard::S ||
+                        event.key.code == sf::Keyboard::Up ||
+                        event.key.code == sf::Keyboard::Down)
                     {
-                        _select_sound.play();  
+                        _select_sound.play();
                     }
-                    
+
                     if (event.key.code == sf::Keyboard::Z)
                     {
                         event.key.code = sf::Keyboard::Up;

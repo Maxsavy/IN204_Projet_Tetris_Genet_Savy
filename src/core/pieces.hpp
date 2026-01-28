@@ -4,6 +4,8 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 
+// definition of the 7 tetrominoes with the four positions for each
+
 // I-piece (Cyan)
 const int I_PIECE[4][4][4] = {
     {{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}},
@@ -11,7 +13,7 @@ const int I_PIECE[4][4][4] = {
     {{0, 0, 0, 0}, {0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}},
     {{0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}}};
 
-// O-piece (Yellow) - ne tourne pas vraiment
+// O-piece (Yellow) - doesnt rotate
 const int O_PIECE[4][4][4] = {
     {{0, 0, 0, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}},
     {{0, 0, 0, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}},
@@ -53,6 +55,7 @@ const int L_PIECE[4][4][4] = {
     {{0, 0, 0, 0}, {0, 0, 0, 0}, {1, 1, 1, 0}, {1, 0, 0, 0}},
     {{0, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}}};
 
+// the random tetro bag used to generate new tetros "randomly" during the game
 const std::array<TetroType, 14> TETRO_BAG = {
     TetroType::I, TetroType::J, TetroType::L, TetroType::O,
     TetroType::S, TetroType::T, TetroType::Z,

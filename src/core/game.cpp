@@ -6,6 +6,7 @@
 
 namespace game
 {
+    // GameController constructor
     GameController::GameController(sf::RenderWindow &w)
         : _window(w)
     {
@@ -24,13 +25,17 @@ namespace game
         }
     }
 
+    // function that loads all resources like textures fonts etc and begins the game loop
     void GameController::start(int mode)
     {
+        // gets the mode
         this->modePLayed = mode;
         loadResources();
+        // gets the window size
         float windowW = static_cast<float>(_window.getSize().x);
         float windowH = static_cast<float>(_window.getSize().y);
 
+        // setup players depending on the mode selected
         if (mode == 1)
         {
             player[0].initializeSinglePlayer();
@@ -48,6 +53,7 @@ namespace game
         gameLoop();
     }
 
+    // function that contains the main game loop
     void GameController::gameLoop()
     {
         sf::Time paceTime = sf::seconds(0.5f);
@@ -57,6 +63,7 @@ namespace game
 
         int numPlayers = (modePLayed == 2) ? 2 : 1;
 
+        // game loop
         while (_window.isOpen())
         {
             setupScene();
@@ -87,6 +94,7 @@ namespace game
                 }
             } // event loop
 
+            // updates and drawing for each player
             for (int p = 0; p < numPlayers; p++)
             {
 
@@ -148,6 +156,7 @@ namespace game
         }
     }
 
+    // function that handles player input for movement and rotation
     void GameController::handlePlayerInput(int playerId, sf::Event &event, int &moveCount, bool &isTouchingGround)
     {
         Player &p = player[playerId];
@@ -157,7 +166,7 @@ namespace game
         sf::Keyboard::Key leftKey = (playerId == 0) ? sf::Keyboard::Q : sf::Keyboard::Left;
         sf::Keyboard::Key rightKey = (playerId == 0) ? sf::Keyboard::D : sf::Keyboard::Right;
         sf::Keyboard::Key rotateKey = (playerId == 0) ? sf::Keyboard::Z : sf::Keyboard::Up;
-
+        // movement handling for each key
         if (event.key.code == downKey)
         {
             collision = p.playerGrid.check_collision(
@@ -234,10 +243,11 @@ namespace game
         }
     }
 
+    // function that sets up the scene for drawing
     void GameController::setupScene()
     {
         _window.clear();
-
+        // textures loading
         if (background_sprite.getTexture())
         {
             setUpBackground(background, background_sprite);
@@ -251,11 +261,13 @@ namespace game
             _window.draw(logo_sprite);
         }
 
+        // drawing for player 1
         player[0].playerGrid.drawGameGrid(_window, player[0].currentTetro);
         player[0].playerGrid.drawNextGrid(_window, player[0].nextTetro);
         player[0].drawDetails(_window, font, modePLayed, 0);
         player[0].playerGrid.drawGhostTetro(_window, player[0].currentTetro);
 
+        // drawing for player 2 if in split screen mode
         if (modePLayed == 2)
         {
             player[1].playerGrid.drawGameGrid(_window, player[1].currentTetro);
@@ -265,6 +277,7 @@ namespace game
         }
     }
 
+    // function that handles game over scenario
     void GameController::gameOver()
     {
         int finalScore = player[0].score;
@@ -275,6 +288,7 @@ namespace game
         menu.showGameOverMenu(finalScore, finalLevel);
     }
 
+    // function that pauses the game and shows the pause menu
     void GameController::pause()
     {
         _game_music.pause();
@@ -284,6 +298,7 @@ namespace game
         _game_music.play();
     }
 
+    // function that creates a rectangle at any location with any color
     sf::RectangleShape getRectangleAt(sf::Vector2f location, sf::Color color)
     {
         sf::RectangleShape box;
@@ -293,6 +308,7 @@ namespace game
         return box;
     }
 
+    // function that loads all resources like textures fonts etc
     void GameController::loadResources()
     {
         loadTexture(background, "assets/images/background_game.jpg", background_sprite);
