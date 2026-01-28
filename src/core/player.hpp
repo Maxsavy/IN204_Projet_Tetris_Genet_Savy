@@ -28,7 +28,7 @@ public:
     ~Player() {}
 
     void generateTetro(Tetro &tempTetro);
-    void lockTetroInGrid(const Tetro &tetro);
+    int hasMadeMove(sf::Event &event);
     void updateScore(int linesCleared);
     void drawDetails(sf::RenderWindow &window, sf::Font &font);
 };

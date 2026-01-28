@@ -2,6 +2,7 @@
 #define GAME_HPP
 
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 #include "player.hpp"
 #include <list>
 #include <random>

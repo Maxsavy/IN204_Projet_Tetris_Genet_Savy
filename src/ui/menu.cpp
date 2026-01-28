@@ -100,7 +100,7 @@ namespace game
         }
         game_menu::Style style{.TitleFont = &_font,
                                .ItemFont = &_font,
-                               .TitleFontSize = 50,
+                               .TitleFontSize = 60,
                                .ItemFontSize = 35,
                                .MenuTitleScaleFactor = 1,
                                .MenuItemScaleFactor = 1.5,
@@ -140,7 +140,7 @@ namespace game
         };
 
         game_menu::MenuConfig config{
-            .title = " Tetris ouiii", .items = items, .style = style};
+            .title = "Retro  Tetris", .items = items, .style = style};
         _main_menu_context.reset(create_menu_context(_window, config));
         _current_menu = _main_menu_context.get();
 
@@ -151,7 +151,7 @@ namespace game
     {
         game_menu::Style style{.TitleFont = &_font,
                                .ItemFont = &_font,
-                               .TitleFontSize = 50,
+                               .TitleFontSize = 60,
                                .ItemFontSize = 35,
                                .MenuTitleScaleFactor = 1,
                                .MenuItemScaleFactor = 1.5,
@@ -196,7 +196,7 @@ namespace game
 
         game_menu::Style style{.TitleFont = &_font,
                                .ItemFont = &_font,
-                               .TitleFontSize = 50,
+                               .TitleFontSize = 60,
                                .ItemFontSize = 35,
                                .MenuTitleScaleFactor = 1,
                                .MenuItemScaleFactor = 1.5,
