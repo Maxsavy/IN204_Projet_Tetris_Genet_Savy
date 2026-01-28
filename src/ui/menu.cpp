@@ -171,7 +171,7 @@ namespace game
         if (!playerName.empty())
         {
             Leaderboard leaderboard;
-            leaderboard.addEntry("src/core/leaderboard.txt", playersName, finalScore, finalLevel);
+            leaderboard.addEntry("src/core/leaderboard.txt", playerName, finalScore, finalLevel);
         }
 
         // Return to main menu

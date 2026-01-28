@@ -3,3 +3,4 @@ Max 1500 10
 Yeti 1200 8
 nathan 40 1
 testtest 40 1
+ohhhh 0 1
